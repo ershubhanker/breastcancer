@@ -1,0 +1,29 @@
+{% load static %} 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BreastCancer</title>
+    <link rel="stylesheet" href="{% static 'myapp/css/style.css' %}">
+</head>
+    <body>
+        <div class="container">
+            <button class="hamburger-menu">
+                &#9776; <!-- Unicode for hamburger icon -->
+            </button>
+            <div id="sidebar" class="active">
+                <div class="sidebar-header">Breast Cancer</div>
+                <ul class="sidebar-menu">
+                    <li><a href="{% url 'home' %}"><i class="icon-home"></i> Home</a></li>
+                    <li><a href="{% url 'upload-image' %}"><i class="icon-user"></i> Upload Image</a></li>
+                </ul>
+            </div>
+            <div id="content">
+                <p>Welcome!! Have a nice day.</p>
+            </div>
+        </div>
+        <script src="{% static 'myapp/js/script.js' %}"></script>
+    </body>
+</html>

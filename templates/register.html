@@ -1,0 +1,129 @@
+{% comment %} <!DOCTYPE html>
+<html>
+<head>
+    <title>Registration</title>
+</head>
+<body>
+    <h1>Registration</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button> <br>
+        Already have an account? <a href="{% url 'doctor_login' %}">Login</a>
+    </form>
+</body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .registration-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+        }
+        .registration-form label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            
+        }
+        .registration-form input[type="text"],
+        .registration-form input[type="email"],
+        .registration-form input[type="password"],
+        .registration-form input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Ensure padding is included in width */
+        }
+        .registration-form button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .registration-form button:hover {
+            background-color: #0056b3;
+        }
+        .action-links {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .action-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-container">
+        <h1>Registration</h1>
+        <form class="registration-form" method="post">
+            {% csrf_token %}
+            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" placeholder="Enter your username" required>
+            
+            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" placeholder="Enter your email" required>
+            
+            <input type="text" name="{{ form.specialty.name }}" id="{{ form.specialty.id_for_label }}" placeholder="Enter your specialty" required>
+            
+            <input type="text" name="{{ form.fullname.name }}" id="{{ form.fullname.id_for_label }}" placeholder="Enter your full name" required>
+            
+            <input type="password" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}" placeholder="Enter your password" required>
+            {% if form.password1.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password1.errors %}
+                        <li style="font-size: 16px; color: red;">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        
+            <input type="password" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}" placeholder="Confirm your password" required>
+            {% if form.password2.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password2.errors %}
+                        <li style="font-size: 16px; color: red;">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <input type="text" name="{{ form.geeks_field.name }}" id="{{ form.geeks_field.id_for_label }}" placeholder="Choose your Desgination" required>
+            <select name="{{ form.geeks_field.name }}" id="{{ form.geeks_field.id_for_label }}">
+                <option value="Doctor">Doctor</option>
+                <option value="Operator">Operator</option>
+              </select>
+
+            <button type="submit">Register</button>
+        </form>
+        <div class="action-links">
+            <a href="{% url 'doctor_login' %}">Login</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4; /* Background color for the content area */
+}
+
+#content{
+    margin-left: 250px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: larger;
+}
+
+#sidebar {
+    width: 250px; /* Initial width of the sidebar */
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh; /* Full-height */
+    background-color: #4B3F6B; /* Purple background */
+    color: white;
+    transition: transform 0.3s ease-in-out;
+    z-index: 2; /* Ensure the sidebar stays on top */
+}
+
+.minimized {
+    transform: translateX(-100%); /* Slide the sidebar out of view */
+}
+
+.sidebar-header {
+    padding-top: 30px;
+    padding-left: 60px;
+    display: flex;
+    align-items: center;
+    font-size: large;
+}
+
+.hamburger-menu {
+    background: none;
+    border: none;
+    color: black; /* Change the color to black */
+    font-size: 24px;
+    cursor: pointer;
+    position: fixed; /* Keep the button fixed */
+    z-index: 3; /* Above the sidebar */
+    top: 20px;
+    left: 20px; /* Adjust as needed */
+    transition: left 0.3s; /* Smooth transition for 
+}
+.minimized {
+    transform: translateX(-100%); /* Slide the sidebar out of view */
+}
+.minimized .hamburger-menu {
+    left: 0; /* Keep the hamburger menu at the side */
+}
+
+.sidebar-menu {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    padding-top: 60px; /* Add padding to top for spacing */
+}
+
+.sidebar-menu li a {
+    padding: 15px 20px;
+    color: white;
+    text-decoration: none;
+    display: block;
+    transition: color 0.3s;
+}
+
+.sidebar-menu li a:hover {
+    color: #999;
+}
+
+.sidebar-social {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+}
+
+.sidebar-social a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-size: 20px;
+    transition: color 0.3s;
+}
+
+.sidebar-social a:hover {
+    color: #999;
+}
+
+#content {
+    transition: margin-left 0.3s ease-in-out;
+    padding: 20px;
+    margin-left: 250px; /* Margin to match the sidebar width */
+    z-index: 1;
+}
+
+.minimized #content {
+    margin-left: 0; /* No margin when the sidebar is minimized */
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        width: 250px; /* Adjust as necessary for smaller screens */
+        transform: translateX(-250px); /* Initially hidden on smaller screens */
+    }
+
+    #content {
+        margin-left: 0;
+    }
+
+    .minimized #sidebar {
+        transform: translateX(0); /* Show the sidebar when not minimized */
+    }
+}
+#upload-content {
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+    padding: 20px;
+    position: relative; /* Ensures that the content is positioned correctly */
+    left: 50%; /* Positions the left edge of the content in the center */
+    transform: translateX(-50%); /* Shifts the content to the left by half its width */
+    max-width: 1000px; /* Maximum width of the content area, adjust as needed */
+    box-sizing: border-box; /* Include padding in the width */
+}
+
+.content-expanded {
+    margin-left: 0; /* No margin when the sidebar is minimized */
+}
+
+.file-box {
+    width: 90%; /* Adjust width as needed */
+    margin: 0 auto 20px auto; /* Center the box and add space below */
+    padding: 10px; /* Add padding inside the box */
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Add space between the contents */
+    border-radius: 10px; /* Rounded corners for the box */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
+    background-color: #f0f0f0; /* Light grey background */
+}
+
+.file-box label {
+    flex-grow: 1; /* Allow the label to grow and push buttons to the edge */
+    margin-right: 10px; /* Space between label and file input */
+}
+.file-description {
+    flex-grow: 1; /* Allows the description to take up available space */
+    margin-right: 20px; /* Space between description and buttons */
+    font-weight: bold;
+}
+
+.file-box input[type="file"] {
+    flex-grow: 2; /* Allow the file input to take up more space */
+}
+
+.upload-btn {
+    background-color: #007bff; /* Bootstrap blue */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-right: 10px; /* Space between upload and delete buttons */
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: #dc3545; /* Bootstrap red */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+/* Styling for icons if you're using a library like Font Awesome */
+.icon-upload:before {
+    content: '\f093'; /* Unicode for Font Awesome upload icon */
+}
+
+.icon-delete:before {
+    content: '\f1f8'; /* Unicode for Font Awesome trash icon */
+}
+
+/* Annotate Image */

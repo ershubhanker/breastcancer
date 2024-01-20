@@ -1,0 +1,11 @@
+Hello {{ user.username }},
+
+Thank you for registering with DrishtiAI. To complete your registration, please click the link below to verify your email address:
+
+{% comment %} {{ domain }}{% url 'verify_email' uidb64=uid token=token %} {% endcomment %}
+
+
+If you did not request this registration, please disregard this email.
+
+Best regards,
+DrishtiAI Team

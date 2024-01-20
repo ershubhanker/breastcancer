@@ -1,0 +1,177 @@
+{% comment %} {% extends "base.html" %}
+{% block title %}Rejected Request{% endblock title %}
+{% block content %}
+
+<h1>Rejected Request page</h1>
+
+{% endblock %} {% endcomment %}
+{% comment %} {% extends "base.html" %}
+{% block title %}Credits{% endblock title %}
+{% block content %}
+
+<h1>Request credit page</h1>
+
+<!-- The form to gather user input -->
+<form id="inputForm">
+    <label for="userInput">Enter number of credit you want :</label>
+    <input type="text" id="userInput" name="userInput" required>
+
+    <!-- Display area for the processed results -->
+    <div id="resultArea"></div>
+
+    <button type="submit">Submit</button> <!-- Add the submit button here -->
+</form>
+
+
+
+<script>
+    // JavaScript to handle input changes
+    document.getElementById("userInput").addEventListener("input", function () {
+        // Get the user input
+        const userInput = document.getElementById("userInput").value;
+
+        // Check if the input is numeric
+        if (!isNaN(userInput)) {
+            // Perform the calculation
+            const result = parseFloat(userInput) * 5;
+
+            // Display the processed result
+            document.getElementById("resultArea").innerHTML = `
+               <p>For ${userInput} credits it will charge: ${result} $</p>
+            `;
+        } else {
+            // Display an error message if the input is not numeric
+            document.getElementById("resultArea").innerHTML = `
+                <h2>Error:</h2>
+                <p>Please enter a numeric value.</p>
+            `;
+        }
+    });
+</script>
+
+{% endblock %} {% endcomment %}
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" class="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard - Admin One Tailwind CSS Admin Dashboard</title>
+
+  <!-- Tailwind is included -->
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static "favicon-32x32.png" %}"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static "favicon-16x16.png" %}"/>
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#00b4b6"/>
+
+  <meta name="description" content="Admin One - free Tailwind dashboard">
+
+  <meta property="og:url" content="https://justboil.github.io/admin-one-tailwind/">
+  <meta property="og:site_name" content="JustBoil.me">
+  <meta property="og:title" content="Admin One HTML">
+  <meta property="og:description" content="Admin One - free Tailwind dashboard">
+  <meta property="og:image" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1920">
+  <meta property="og:image:height" content="960">
+
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Admin One HTML">
+  <meta property="twitter:description" content="Admin One - free Tailwind dashboard">
+  <meta property="twitter:image:src" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
+  <meta property="twitter:image:width" content="1920">
+  <meta property="twitter:image:height" content="960">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130795909-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-130795909-1');
+  </script>
+
+  <style>
+        /* Center the main section using flexbox */
+        body {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Ensure the page takes the full viewport height */
+        }
+
+        /* Additional styling for the section */
+        .main-section {
+            text-align: center; /* Center the content inside the section */
+            border: 1px solid #ccc; /* Add a border for visualization */
+            padding: 20px; /* Add some padding for spacing */
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="app">
+  {% include 'sidebar.html' %}
+  {% include 'navbar.html' %}
+
+
+
+
+{% comment %} <section class="section main-section">
+    <div class="card">
+        <header class="card-header">
+            <p class="card-header-title">Request Credits</p>
+        </header>
+        <div class="card-content">
+            <!-- The form to gather user input -->
+            <form id="inputForm">
+                <label for="userInput">Enter the number of credits you want:</label>
+                <input type="text" id="userInput" name="userInput" required placeholder= 'ENTER CREDIT VALUE'>
+                <!-- Display area for the processed results -->
+                <div id="resultArea"></div>
+                <button type="submit">Submit</button> <!-- Add the submit button here -->
+            </form>
+        </div>
+    </div>
+</section> {% endcomment %}
+<p>THIS IS REJECTED CREDIT PAGE</p>
+
+ 
+
+
+
+
+
+
+
+<!-- Scripts below are for demo only -->
+<script type="text/javascript" src="{% static 'js/main.min.js' %}"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+<script type="text/javascript" src="{% static 'js/chart.sample.min.js' %}"></script>
+
+
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '658339141622648');
+  fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=658339141622648&ev=PageView&noscript=1"/></noscript>
+
+<!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
+<link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+
+</body>
+</html>

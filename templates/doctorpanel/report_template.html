@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eye Report</title>
+</head>
+<body>
+    <h1>Eye Report</h1>
+    
+    <h3>Consulted doctor {{ request.user.username }}</h3>
+    <h2>Images</h2>
+    {% if report_data.left_eye_image_path %}
+        <p><strong>Left Eye Image:</strong></p>
+        <img src="{{ MEDIA_URL }}{{ report_data.left_eye_image_path }}" width="100" height="100"/>
+    {% endif %}
+
+    {% if report_data.right_eye_image_path %}
+        <p><strong>Right Eye Image:</strong></p>
+        <img src="{{ MEDIA_URL }}{{ report_data.right_eye_image_path }}" width="100" height="100"/>
+    {% endif %}
+
+    <h2>Patient Information</h2>
+    <p><strong>Patient ID:</strong> {{ report_data.patient_id }}</p>
+    <p><strong>Patient Name:</strong> {{ report_data.patient_name }}</p>
+    <p><strong>Diabetes Status:</strong> {{ report_data.diabetes_status }}</p>
+    <p><strong>Diabetes Type:</strong> {{ report_data.diabetes_type }}</p>
+
+    <h2>Report</h2>
+    <h3><strong>summary</strong> {{ report_data.summary }}</h3>
+    <h3><strong>icd_codes</strong> {{ report_data.icd_codes }}</h3>
+    <h3><strong>icd_desc</strong> {{ report_data.icd_desc }}</h3>
+    <h3><strong>left_result</strong> {{ report_data.left_result }}</h3>
+    <h3><strong>right_result</strong> {{ report_data.right_result }}</h3>
+    <h2>API Responses</h2>
+    {% for key, response in api_responses.left_eye.items %}
+    {% if response is not none %}
+    <h3>Left Eye API Responses</h3>
+
+    <p><strong>{{ key }}:</strong> {{ response }}</p>
+    {% endif %}
+    {% endfor %}
+
+    {% for key, response in api_responses.right_eye.items %}
+    {% if response is not none %}
+    <h3>Right Eye API Responses</h3>
+    <p><strong>{{ key }}:</strong> {{ response }}</p>
+    {% endif %}
+    {% endfor %}
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" class="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forms - Admin One Tailwind CSS Admin Dashboard</title>
+
+  <!-- Tailwind is included -->
+  <link rel="stylesheet" href="{% static "css/main.css" %}">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png"/>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png"/>
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#00b4b6"/>
+
+  <meta name="description" content="Admin One - free Tailwind dashboard">
+
+  <meta property="og:url" content="https://justboil.github.io/admin-one-tailwind/">
+  <meta property="og:site_name" content="JustBoil.me">
+  <meta property="og:title" content="Admin One HTML">
+  <meta property="og:description" content="Admin One - free Tailwind dashboard">
+  <meta property="og:image" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1920">
+  <meta property="og:image:height" content="960">
+
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="Admin One HTML">
+  <meta property="twitter:description" content="Admin One - free Tailwind dashboard">
+  <meta property="twitter:image:src" content="https://justboil.me/images/one-tailwind/repository-preview-hi-res.png">
+  <meta property="twitter:image:width" content="1920">
+  <meta property="twitter:image:height" content="960">
+  <style>
+    .container{
+        display: flex;
+    }
+    form {
+      /* Maintain your existing styles */
+      width: 100%;
+      max-width: 1200px;
+      display: inline-block;
+      margin: 20px; /* Add margin for better spacing */
+      padding: 40px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+  
+    label {
+      /* Adjust label styles */
+      display: inline-block; /* Labels will appear on the same line as the input */
+      width: 150px; /* Set a fixed width for labels, adjust as needed */
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+  
+    input[type="text"],
+    input[type="email"],
+    select,
+    input[type="file"] {
+      /* Maintain your existing input styles */
+      width: calc(100% - 10px); /* Adjust width to leave space for border */
+      padding: 10px;
+      display: inline-block;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+  
+    .btn-primary {
+      /* Maintain your existing button styles */
+      background-color: #0479ff;
+      color: #fff;
+      border: 3px solid #0479ff;
+      border-radius: 30px;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+  
+    button {
+      /* Maintain your existing button styles */
+      background-color: #0479ff;
+      color: #fff;
+      border: 2px solid #0479ff;
+      border-radius: 40px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  
+    button:hover {
+      /* Maintain your existing button hover styles */
+      background-color: #0361d8;
+      border-color: #0361d8;
+    }
+  
+    #status {
+      /* Maintain your existing status styles */
+      margin-top: 10px;
+      color: #0479ff;
+    }
+  
+    /* Additional styles for image upload section */
+    .image-upload {
+      margin-top: 20px;
+    }
+  
+    .image-upload label {
+      width: auto;
+      margin-bottom: 0;
+    }
+  
+    .image-upload input[type="file"] {
+      width: auto;
+      margin-top: 10px;
+    }
+    .image-upload {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between; /* Align items with space in between */
+  }
+
+  .image-upload label {
+    flex: 1; /* Take up equal width */
+    margin-right: 10px; /* Add spacing between labels */
+  }
+
+  .image-upload input[type="file"] {
+    flex: 2; /* Take up more width for the input */
+  }
+  </style>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-130795909-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-130795909-1');
+  </script>
+  <script>
+
+    function showSpinner() {
+        const submitButton = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        
+        submitButton.disabled = true;
+        loading.style.display = 'block';
+    }
+</script>
+</head>
+<body>
+
+<div id="app">
+  {% include 'navbar.html' %}
+
+  {% include 'sidebar.html' %}
+    
+      
+      
+
+<section class="is-title-bar">
+  <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
+    <ul>
+      <li>Admin</li>
+      <li>Forms</li>
+    </ul>
+    {% comment %} <a href="https://justboil.me/" onclick="alert('Coming soon'); return false" target="_blank" class="button blue">
+      <span class="icon"><i class="mdi mdi-credit-card-outline"></i></span>
+      <span>Premium Demo</span>
+    </a> {% endcomment %}
+  </div>
+</section>
+
+  <section class="section main-section">
+    <div class="card mb-6">
+      <header class="card-header">
+        <p class="card-header-title">
+          <span class="icon"><i class="mdi mdi-ballot"></i></span>
+          UPLOADS IMAGES
+        </p>
+      </header>
+      <div class="card-content">
+        <form method="post" enctype="multipart/form-data" onsubmit="showSpinner()">
+            {% csrf_token %}
+            <div class="container">    
+                <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
+                    <div class="sm:col-span-2">
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white" for="{{ form.patient_name.id_for_label }}">Patient Name</label><br>
+                        {{ form.patient_name }}
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"  for="{{ form.patient_id.id_for_label }}">Patient ID</label><br>
+                        {{ form.patient_id }}
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"  for="{{ form.patient_email.id_for_label }}">Patient mail</label><br>
+                        {{ form.patient_email }}<br>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white" for="{{ form.diabetes_status.id_for_label }}">Diabetes Status</label><br>
+                        {{ form.diabetes_status }}<br>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white"  for="{{ form.diabetes_type.id_for_label }}">Diabetes Type</label><br>
+                        {{ form.diabetes_type }}<br>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white" for="{{ form.appointed_doctor.id_for_label }}">Doctor</label>
+                        {{ form.appointed_doctor.value|default:request.user.username }}
+                    </div><br>
+                    <div class = "pt-5"> 
+                        <label class="block text-sm font-medium leading-6 text-gray-900 dark:text-white">Images to Upload</label>
+                        <div class = "pt-5">
+                        <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white">
+                            <div class="text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-300 dark:text-white" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="mt-4 flex text-sm leading-6 text-gray-600 dark:text-white">
+                                <label for="{{ form.left_image.id_for_label }}">Upload Left Image</label><br>
+                                {{ form.left_image }}<br><br>
+                            </div>
+                            <p class="text-xs leading-5 text-gray-600 dark:text-white">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            <div class = "ml-3 mt-6 pt-10"> 
+                <div class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 dark:border-white">
+                    <div class="text-center dark:text-white">
+                    <svg class="mx-auto h-12 w-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M1.5 6a2.25 2.25 0 012.25-2.25h16.5A2.25 2.25 0 0122.5 6v12a2.25 2.25 0 01-2.25 2.25H3.75A2.25 2.25 0 011.5 18V6zM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0021 18v-1.94l-2.69-2.689a1.5 1.5 0 00-2.12 0l-.88.879.97.97a.75.75 0 11-1.06 1.06l-5.16-5.159a1.5 1.5 0 00-2.12 0L3 16.061zm10.125-7.81a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0z" clip-rule="evenodd" />
+                    </svg>
+                    <div class="mt-4 flex text-sm leading-6 text-gray-600 dark:text-white">
+                        <label for="{{ form.right_image.id_for_label }}">Upload Right Image</label><br>
+                        {{ form.right_image }}
+                    </div>
+                    <p class="text-xs leading-5 text-gray-600 dark:text-white">PNG, JPG, GIF up to 10MB</p>
+                    </div>
+                </div>
+            </div>
+            <style>
+                /* Apply common styles to labels */
+                label {
+                    display: block;
+                    font-size: 16px; /* Adjust the font size to your preference */
+                    margin-bottom: 6px; /* Add spacing between labels and inputs */
+                }
+            
+                /* Style input fields */
+                input[type="text"], input[type="email"], select {
+                    width: 30%; /* Make the input fields full-width */
+                    padding: 8px; /* Adjust the padding to your preference */
+                    border: 1px solid black; /* Set the outline to black */
+                }
+            </style>
+            
+            {% comment %} &nbsp;&nbsp;&nbsp;&nbsp; {% endcomment %}
+            {% comment %} <button type="submit"  id="submitBtn"class="hidden btn btn-primary text-white ml-72 px-5 mt-8"  style="border: 2px solid rgb(4, 121, 255); border-radius: 20px; padding: 7px; background: rgb(4, 121, 255);">Submit</button> {% endcomment %}
+            <button type="submit" id="submitBtn" class="btn-primary text-white ml-72 px-5 mt-8">Submit</button>
+            <span id="loading" style="display: none;">Loading...</span>
+            <p id="status">{{status}}</p>
+        </form>
+      </div>
+    </div>
+
+    
+  </section>
+
+
+<footer class="footer">
+  
+</footer>
+
+
+<!-- Scripts below are for demo only -->
+<script type="text/javascript" src="js/main.min.js?v=1628755089081"></script>
+
+
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '658339141622648');
+  fbq('track', 'PageView');
+
+
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=658339141622648&ev=PageView&noscript=1"/></noscript>
+
+<!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
+<link rel="stylesheet" href="{% static "https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css" %}">
+
+</body>
+</html>

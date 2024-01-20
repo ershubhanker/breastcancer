@@ -1,0 +1,71 @@
+
+{% block content %}
+
+<style>
+      .errorlist{
+        color: red;
+        list-style-type:none;
+      }
+      .success{We'll never share your email with anyone else.
+        color:green;
+      }
+</style>
+<div class="container">
+ <div class="row my-3">
+  <div class="col-sm-6 offset-sm-3">
+   <h3>ENTER YOUR NEW PASSWORD</h3>
+   <hr>
+
+
+   <form action="" method="post" novalidate class="shadow p-5">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="inputPassword1" class="form-label">Password</label>
+        <input type="password1" name ="password" class="form-control" id="inputPassword1">
+        </div>
+     
+      {% if messages %}
+       {% for message in messages %}
+        
+         <span {% if message.tags %}   class ="{{message.tags}}"  {% endif %}>
+            {{message}}</span>
+
+        {% endfor %}
+
+    {% endif %}
+      <div class="text-end">
+      <button type="Submit" class="btn btn-danger">Submit</button>
+      </div>
+      <br>
+
+         <div class="col-md-3">
+          <link   rel="stylesheet" 
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+            crossorigin="anonymous">
+           <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" 
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" 
+            crossorigin="anonymous">
+   
+   
+   
+          </script>
+        
+         
+      </form>
+      
+
+
+     
+   
+
+  </div>
+ </div>
+</div>
+
+
+
+
+   
+
+{%endblock%}

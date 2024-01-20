@@ -1,0 +1,168 @@
+
+{% comment %} <!DOCTYPE html>
+{% load static %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://unpkg.com/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
+        <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css"
+        />
+        
+</head>
+    <body class = "bg-gray-50">
+        {% include 'navbar.html'  %}
+        {% include 'sidebar.html' %}
+        <main class=" pl-24 md:ml-52 h-auto">
+            {% block content %}
+            {% endblock %}
+        </main>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $(".dropdown-button").click(function() {
+                    $(this).next(".dropdown-menu").toggleClass("hidden");
+                });
+        
+                $(document).click(function(event) {
+                    // Check if the clicked element is not part of the dropdown
+                    if (!$(event.target).closest(".dropdown-button").length &&
+                        !$(event.target).closest(".dropdown-menu").length) {
+                        $(".dropdown-menu").addClass("hidden");
+                    }
+                });
+            });
+        </script>
+        <script type="text/javascript">
+            function dropdown() {
+              document.querySelector("#submenu").classList.toggle("hidden");
+              document.querySelector("#arrow").classList.toggle("rotate-0");
+            }
+            dropdown();
+      
+            function openSidebar() {
+              document.querySelector(".sidebar").classList.toggle("hidden");
+            }
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
+    </body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  
+<!-- Mirrored from demo.tailadmin.com/ by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 23 Aug 2023 05:12:39 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    {% comment %} <title>
+      eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template
+    </title> {% endcomment %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="favicon.ico"><link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+
+    <body
+        x-data="{ page: 'ecommerce', 'loaded': true, 'darkMode': true, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false }"
+        x-init="
+            darkMode = JSON.parse(localStorage.getItem('darkMode'));
+            $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+        :class="{'dark text-bodydark bg-boxdark-2': darkMode === true}"
+        >
+            <!-- ===== Preloader Start ===== -->
+            <div
+        x-show="loaded"
+        x-init="window.addEventListener('DOMContentLoaded', () => {setTimeout(() => loaded = false, 500)})"
+        class="fixed left-0 top-0 z-999999 flex h-screen w-screen items-center justify-center bg-white dark:bg-black"
+        >
+        <div
+            class="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"
+        ></div>
+        </div>
+        <!-- ===== Preloader End ===== -->
+
+        <!-- ===== Page Wrapper Start ===== -->
+        <div class="flex h-screen overflow-hidden">
+            <!-- ===== Sidebar Start ===== -->
+            {% include 'sidebar.html'  %}
+            <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+                {% include 'navbar.html' %}
+                <main>
+                    <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+                </main>
+            </div>
+        </div>
+        <script defer src="{% static 'js/bundle.js' %}"></script>
+        <script defer src="{% static 'js/script.js' %}"></script>
+        {% comment %} <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8b253dfea2ab4077af8c6f58422dfbfd1689876627854" integrity="sha512-bjgnUKX4azu3dLTVtie9u6TKqgx29RBwfj3QXYt5EKfWM/9hPSAI/4qcV5NACjwAo8UtTeWefx6Zq5PHcMm7Tg==" data-cf-beacon='{"rayId":"7fb0dbe3ae3c2e85","version":"2023.8.0","r":1,"b":1,"token":"67f7a278e3374824ae6dd92295d38f77","si":100}' crossorigin="anonymous"></script> {% endcomment %}
+        {% comment %} <script>
+            $(document).ready(function() {
+                $(".dropdown-button").click(function() {
+                    $(this).next(".dropdown-menu").toggleClass("hidden");
+                });
+        
+                $(document).click(function(event) {
+                    // Check if the clicked element is not part of the dropdown
+                    if (!$(event.target).closest(".dropdown-button").length &&
+                        !$(event.target).closest(".dropdown-menu").length) {
+                        $(".dropdown-menu").addClass("hidden");
+                    }
+                });
+            });
+        </script> {% endcomment %}
+        <script>
+            // Function to check if at least one image is selected
+            function checkImagesSelected() {
+                const imageInputs = document.querySelectorAll('input[type="file"]');
+                let isImageSelected = false;
+        
+                imageInputs.forEach(input => {
+                    if (input.files.length > 0) {
+                        isImageSelected = true;
+                    }
+                });
+        
+                const submitButton = document.getElementById('submitBtn');
+                if (isImageSelected) {
+                    submitButton.classList.remove('hidden');
+                } else {
+                    submitButton.classList.add('hidden');
+                }
+            }
+        
+            // Call the function on page load
+            document.addEventListener('DOMContentLoaded', checkImagesSelected);
+        
+            // Call the function whenever an image input changes
+            const imageInputs = document.querySelectorAll('input[type="file"]');
+            imageInputs.forEach(input => {
+                input.addEventListener('change', checkImagesSelected);
+            });
+        </script>
+        <script type="text/javascript">
+            function dropdown() {
+              document.querySelector("#submenu").classList.toggle("hidden");
+              document.querySelector("#arrow").classList.toggle("rotate-0");
+            }
+            dropdown();
+      
+            function openSidebar() {
+              document.querySelector(".sidebar").classList.toggle("hidden");
+            }
+        </script>
+    </body>
+</html>
