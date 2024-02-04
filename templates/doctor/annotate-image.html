@@ -380,45 +380,46 @@
     <link rel="stylesheet" href="{% static '/assets/vendor/css/pages/page-auth.css' %}" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-    #main-image-container {
-    text-align: center;
-    margin-bottom: 20px;
-    }
-
-    #main-image-container img {
-    width: 100%;
-    height: auto; 
-    border: 3px solid #666;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    #saveImage{
-        background-color: rgb(20, 20, 179);
-        border: 3px solid #000;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        transition: transform 0.2s;
-    }
-    #saveImage:hover {
-        transform: scale(1.1); 
-    }
-    
-    #thumbnail-container {
-    text-align: center; 
-    }
-
-    .thumbnail {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border: 2px solid #999;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-    }
-
-    .thumbnail:hover {
-        transform: scale(1.1);
-    }
+      #main-image-container {
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      }
+  
+      #main-image-container img {
+      width: 100%;
+      height: auto; 
+      border: 3px solid #666;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+  
+      #saveImage{
+          background-color: rgb(20, 20, 179);
+          border: 3px solid #000;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+          transition: transform 0.2s;
+      }
+      #saveImage:hover {
+          transform: scale(1.1); 
+      }
+      
+      #thumbnail-container {
+      text-align: center; 
+      }
+  
+      .thumbnail {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 2px solid #999;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      }
+  
+      .thumbnail:hover {
+          transform: scale(1.1);
+      }
     </style>
     <!-- Helpers -->
     <script src="{% static '/assets/js/config.js' %}"></script>
@@ -640,30 +641,83 @@
           <!-- / Navbar -->
 
           <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
-            <div id="content">
-                {% if images %}
-                    <div id="main-image-container" style="position: relative; display: inline-block;">
-                        <img id="main-image" src="{{ images.0.image.url }}" alt="Main Image" style="max-width: 100%; display: block; height: 100%">
-                        <canvas id="annotationCanvas" style="position: absolute; left: 0; top: 0;"></canvas>
+          <!-- imran -->
+          <!-- <div id="content" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);display: flex;margin-right:100px;margin-left:100px; justify-content: space-between;">
+
+            <div id="main-image-container" style="position: relative; display: inline-block;">
+              <img id="main-image" src="{{ images.0.image.url }}" alt=" Main Image" style="max-width: 100%; display: block; height: 100%">
+              <canvas id="annotationCanvas" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;"></canvas>
+            </div> 
+        
+            <div id="thumbnail-container">
+
+        
+                {% for image in images %}
+                    <div class="thumbnail" style="margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 20px; display: flex; align-items: center;">
+        
+                        <div style="flex-grow: 1;">
+                            <img src="{{ image.image.url }}" alt="Thumbnail" onclick="changeMainImage('{{ image.image.url }}')" style="max-width: 100%; cursor: pointer;">
+                        </div>
+                        <div style="text-align: right;">
+                            <p>{{ image.name }}</p>
+                        </div>
+        
                     </div>
-                    <br>
-                    <button id="saveImage" onclick="saveAnnotatedImage()">Save Image</button>
-                    <br>
-                    <button id="addCrossButton" onclick="toggleAddCrossMode()">Add Cross</button>
-                    <br>
-                    <hr>
-                    <div id="thumbnail-container">
-                        {% for image in images %}
-                            <img class="thumbnail" src="{{ image.image.url }}" alt="Thumbnail" onclick="changeMainImage('{{ image.image.url }}')">
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>No images to display.</p>
-                {% endif %}
+                {% endfor %}
+        
+            </div> 
+         
+            <div style="padding: 20px; display: flex; flex-direction: column; align-items: flex-end;margin-right:70px;">
+
+              <div>
+                <p style = "margin-bottom: 90px;font-weight:bold">CENTER</p>
+              </div>
+              <div>
+                <p style = "margin-bottom: 100px;font-weight:bold">LEFT 45% C</p>
+              </div>
+              <div>
+                <p style = "margin-bottom: 100px;font-weight:bold">LEFT 90 % C</p>
+              </div>
+              <div>
+                <p style = "margin-bottom: 100px;font-weight:bold;">RIGHT 45% C</p>
+              </div>
+              <div>
+                <p style = "font-weight:bold;">RIGHT 90% C</p>
+              </div>
+
             </div>
-        </div>
+
+          </div>     
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+        
+                <button id="saveImage" onclick="saveAnnotatedImage()", style="margin-left: 500px; border-radius:10px">Save Image</button>
+                <button id="addCrossButton" onclick="toggleAddCrossMode()", style="margin-right: 500px; border-radius:10px">Add Cross</button>
+                <hr>
+        
+            </div> -->
+            <div id="content" style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-right:100px;margin-left:100px; justify-content: space-between;">
+              {% if images %}
+                  <div id="main-image-container" style="position: relative; display: inline-block;">
+                      <img id="main-image" src="{{ images.0.image.url }}" alt="Main Image" style="max-width: 100%; display: block; height: 100%">
+                      <canvas id="annotationCanvas" style="position: absolute; left: 0; top: 0;"></canvas>
+                  </div>
+                  <div class="button-container" style="display:flex; gap:10px; margin-left:37%">
+                    <br>
+                    <button id="saveImage" style="border-radius: 5px;" onclick="saveAnnotatedImage()">Save Image</button>
+                    <br>
+                    <button id="addCrossButton" style="border-radius: 5px;" onclick="toggleAddCrossMode()">Add Cross</button>
+                    <br>
+                  </div>
+                  <hr>
+                  <div id="thumbnail-container">
+                      {% for image in images %}
+                          <img class="thumbnail" src="{{ image.image.url }}" alt="Thumbnail" onclick="changeMainImage('{{ image.image.url }}')">
+                      {% endfor %}
+                  </div>
+                  {% else %}
+                      <p>No images to display.</p>
+                  {% endif %}
+              </div>
             <!-- / Content -->
 
             <!-- Footer -->
@@ -742,203 +796,203 @@
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="{% static 'myapp/js/script.js' %}"></script>
-        <script>
-            let pathPoints = [];
-            let completedPolygons = [];
-            let isPolygonClosed = false;
-            let addCrossMode = false;
-            let crosses = [];
-    
-            document.getElementById('main-image-container').addEventListener('click', function(event) {
-                const rect = this.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-    
-                if (addCrossMode) {
-                    addCrossToCanvas(x, y);
-                } else {
-                    addPointToPath(x, y);
-                }
-            });
-    
-            function addPointToPath(x, y) {
-                if (pathPoints.length > 0) {
-                    const dx = x - pathPoints[0].x;
-                    const dy = y - pathPoints[0].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 10 && pathPoints.length > 2) {
-                        pathPoints.push(pathPoints[0]);
-                        isPolygonClosed = true;
-                        updatePathOnImage();
-                        completedPolygons.push([...pathPoints]);
-                        pathPoints = [];
-                        isPolygonClosed = false;
-                        return;
-                    }
-                }
-    
-                if (pathPoints.length >= 13) {
-                    alert('You can only add 13 points to the polygon, including the closing point.');
-                } else {
-                    pathPoints.push({ x, y });
-                    updatePathOnImage();
-                }
-            }
-    
-            function updatePathOnImage() {
-                const canvas = document.getElementById('annotationCanvas');
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-    
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                completedPolygons.forEach(polygon => {
-                    ctx.beginPath();
-                    polygon.forEach((point, index) => {
-                        ctx.lineTo(point.x, point.y);
-                    });
-                    ctx.closePath();
-                    ctx.strokeStyle = '#000000';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                });
-    
-                if(pathPoints.length > 0) {
-                    ctx.beginPath();
-                    pathPoints.forEach((point, index) => {
-                        ctx.lineTo(point.x, point.y);
-                    });
-                    if(isPolygonClosed) {
-                        ctx.closePath();
-                    }
-                    ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                }
-            }
-    
-            function toggleAddCrossMode() {
-                addCrossMode = !addCrossMode;
-                document.getElementById('addCrossButton').textContent = addCrossMode ? 'Finish Adding Crosses' : 'Add Cross';
-            }
-    
-            function addCrossToCanvas(x, y) {
-                const cross = { x, y };
-                crosses.push(cross);
-                drawCross(cross);
-            }
-    
-            function drawCross(cross) {
-                const canvas = document.getElementById('annotationCanvas');
-                const ctx = canvas.getContext('2d');
-                const crossSize = 10;
-    
-                ctx.beginPath();
-                ctx.moveTo(cross.x - crossSize, cross.y);
-                ctx.lineTo(cross.x + crossSize, cross.y);
-                ctx.moveTo(cross.x, cross.y - crossSize);
-                ctx.lineTo(cross.x, cross.y + crossSize);
-                ctx.strokeStyle = '#000000';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-    
-            function initializeCanvas() {
-                const mainImage = document.getElementById('main-image');
-                const canvas = document.getElementById('annotationCanvas');
-                canvas.width = mainImage.clientWidth;
-                canvas.height = mainImage.clientHeight;
-                reapplyAnnotations(canvas.getContext('2d'));
-            }
-    
-            window.onload = initializeCanvas;
-            window.addEventListener('resize', initializeCanvas);
-    
-            function changeMainImage(imageUrl) {
-                const mainImage = document.getElementById('main-image');
-                mainImage.src = imageUrl;
-                completedPolygons = []; 
-                pathPoints = [];
-                crosses = [];
-                initializeCanvas();
-            }
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    pathPoints = [];
-                    updatePathOnImage();
-                }
-            });
-            
-            function getCookie(name) {
-                let cookieValue = null;
-                if (document.cookie && document.cookie !== '') {
-                    const cookies = document.cookie.split(';');
-                    for (let i = 0; i < cookies.length; i++) {
-                        const cookie = cookies[i].trim();
-                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                            break;
-                        }
-                    }
-                }
-                return cookieValue;
-            }
-            function saveAnnotatedImage() {
-                const canvas = document.getElementById('annotationCanvas');
-                const ctx = canvas.getContext('2d');
-                const mainImage = document.getElementById('main-image');
-            
+    <script>
+        let pathPoints = [];
+        let completedPolygons = [];
+        let isPolygonClosed = false;
+        let addCrossMode = false;
+        let crosses = [];
 
-                if (!mainImage.complete) {
-                    alert('Image not yet loaded. Please try again.');
+        document.getElementById('main-image-container').addEventListener('click', function(event) {
+            const rect = this.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            if (addCrossMode) {
+                addCrossToCanvas(x, y);
+            } else {
+                addPointToPath(x, y);
+            }
+        });
+
+        function addPointToPath(x, y) {
+            if (pathPoints.length > 0) {
+                const dx = x - pathPoints[0].x;
+                const dy = y - pathPoints[0].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 10 && pathPoints.length > 2) {
+                    pathPoints.push(pathPoints[0]);
+                    isPolygonClosed = true;
+                    updatePathOnImage();
+                    completedPolygons.push([...pathPoints]);
+                    pathPoints = [];
+                    isPolygonClosed = false;
                     return;
                 }
-                canvas.width = mainImage.naturalWidth;
-                canvas.height = mainImage.naturalHeight;
-                ctx.drawImage(mainImage, 0, 0, canvas.width, canvas.height);
-            
-                reapplyAnnotations(ctx);
-            
-                const imageData = canvas.toDataURL('image/png');
-         
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-              
-                fetch("{% url 'save_annotated_image' %}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify({ 'imageData': imageData })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.status === 'success') {
-                        
-                        alert('Image saved successfully.');
-                    } else {
-                        alert('Failed to save image.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while saving the image.');
-                });
             }
+
+            if (pathPoints.length >= 13) {
+                alert('You can only add 13 points to the polygon, including the closing point.');
+            } else {
+                pathPoints.push({ x, y });
+                updatePathOnImage();
+            }
+        }
+
+        function updatePathOnImage() {
+            const canvas = document.getElementById('annotationCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            function reapplyAnnotations(context) {
-                completedPolygons.forEach(polygon => {
-                    context.beginPath();
-                    polygon.forEach((point, index) => {
-                        context.lineTo(point.x, point.y);
-                    });
-                    context.closePath();
-                    context.strokeStyle = '#000000';
-                    context.lineWidth = 2;
-                    context.stroke();
+            completedPolygons.forEach(polygon => {
+                ctx.beginPath();
+                polygon.forEach((point, index) => {
+                    ctx.lineTo(point.x, point.y);
                 });
-                crosses.forEach(cross => drawCross(cross)); 
-            }            
-        </script>    
+                ctx.closePath();
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            if(pathPoints.length > 0) {
+                ctx.beginPath();
+                pathPoints.forEach((point, index) => {
+                    ctx.lineTo(point.x, point.y);
+                });
+                if(isPolygonClosed) {
+                    ctx.closePath();
+                }
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function toggleAddCrossMode() {
+            addCrossMode = !addCrossMode;
+            document.getElementById('addCrossButton').textContent = addCrossMode ? 'Finish Adding Crosses' : 'Add Cross';
+        }
+
+        function addCrossToCanvas(x, y) {
+            const cross = { x, y };
+            crosses.push(cross);
+            drawCross(cross);
+        }
+
+        function drawCross(cross) {
+            const canvas = document.getElementById('annotationCanvas');
+            const ctx = canvas.getContext('2d');
+            const crossSize = 10;
+
+            ctx.beginPath();
+            ctx.moveTo(cross.x - crossSize, cross.y);
+            ctx.lineTo(cross.x + crossSize, cross.y);
+            ctx.moveTo(cross.x, cross.y - crossSize);
+            ctx.lineTo(cross.x, cross.y + crossSize);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        function initializeCanvas() {
+            const mainImage = document.getElementById('main-image');
+            const canvas = document.getElementById('annotationCanvas');
+            canvas.width = mainImage.clientWidth;
+            canvas.height = mainImage.clientHeight;
+            reapplyAnnotations(canvas.getContext('2d'));
+        }
+
+        window.onload = initializeCanvas;
+        window.addEventListener('resize', initializeCanvas);
+
+        function changeMainImage(imageUrl) {
+            const mainImage = document.getElementById('main-image');
+            mainImage.src = imageUrl;
+            completedPolygons = []; 
+            pathPoints = [];
+            crosses = [];
+            initializeCanvas();
+        }
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                pathPoints = [];
+                updatePathOnImage();
+            }
+        });
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        function saveAnnotatedImage() {
+            const canvas = document.getElementById('annotationCanvas');
+            const ctx = canvas.getContext('2d');
+            const mainImage = document.getElementById('main-image');
+        
+
+            if (!mainImage.complete) {
+                alert('Image not yet loaded. Please try again.');
+                return;
+            }
+            canvas.width = mainImage.naturalWidth;
+            canvas.height = mainImage.naturalHeight;
+            ctx.drawImage(mainImage, 0, 0, canvas.width, canvas.height);
+        
+            reapplyAnnotations(ctx);
+        
+            const imageData = canvas.toDataURL('image/png');
+     
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+            fetch("{% url 'save_annotated_image' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ 'imageData': imageData })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    
+                    alert('Image saved successfully.');
+                } else {
+                    alert('Failed to save image.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the image.');
+            });
+        }
+        
+        function reapplyAnnotations(context) {
+            completedPolygons.forEach(polygon => {
+                context.beginPath();
+                polygon.forEach((point, index) => {
+                    context.lineTo(point.x, point.y);
+                });
+                context.closePath();
+                context.strokeStyle = '#000000';
+                context.lineWidth = 2;
+                context.stroke();
+            });
+            crosses.forEach(cross => drawCross(cross)); 
+        }            
+    </script>   
   </body>
 </html>

@@ -227,7 +227,7 @@
             <li class="menu-item active">
               <a href="{% url 'home' %}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Dashboard">Home</div>
+                <div data-i18n="Dashboard">Operator Form</div>
               </a>
               <a href="{% url 'upload-image' %}" class="menu-link mt-1" >
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -368,6 +368,13 @@
                         <button type="submit" class="upload-btn">Upload</button>
                         <button type="button" class="delete-btn" data-imageid="{{ center_image.id }}" onclick="deleteImage('{{ center_image.id }}')">Delete</button>
                     </form>
+                    <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
+                      {% csrf_token %}
+                      <label>Upload Left 45 Image</label>
+                      <input type="file" name="left_45_image" required>
+                      <button type="submit" class="upload-btn">Upload</button>
+                      <button type="button" class="delete-btn">Delete</button>
+                  </form>
                     <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
                         {% csrf_token %}
                         <label>Upload Left 90 Image</label>

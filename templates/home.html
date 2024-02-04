@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome to the Home Page</h1>
+    {% if request.user.is_authenticated %}
+        <p>Hello, Dr. {{ request.user.username }}!</p>
+        <a href="{% url 'doctor_logout' %}">Logout</a>
+    {% else %}
+        <p>Welcome, guest!</p>
+        <a href="{% url 'doctor_login' %}">Login</a> | <a href="{% url 'doctor_register' %}">Register</a>
+    {% endif %}
+</body>
+</html>

@@ -6,6 +6,9 @@ from django.db.models import Q
 from .models import Patient
 from itertools import count
 import uuid, random, string
+from .models import UserForm
+from datetime import date
+from django.forms import ModelForm
 
 Operator =(  
     ("Operator", "Operator"), 
@@ -58,6 +61,49 @@ class DoctorLoginForm(AuthenticationForm):
         return self.cleaned_data
     
 
+
+
+
+class UserFormForm(forms.ModelForm):
+    class Meta:
+        model = UserForm
+        fields = [
+            'patient_id',
+            'patient_name',
+            'patient_email',
+            'appointed_doctor',
+            'patient_age',
+            'patient_gender',
+            'center',
+            'report_generation_date',
+            'scan_date',
+        ]
+
+    widgets = {
+        'patient_gender': forms.Select(choices=UserForm.GENDER_CHOICES),
+        'center': forms.Select(choices=UserForm.CENTER_CHOICES),
+        'report_generation_date': forms.DateInput(format='%d/%m/%Y', attrs={'readonly': 'readonly'}),
+        'scan_date': forms.DateInput(format='%d/%m/%Y', attrs={'readonly': 'readonly'}),
+    } 
+
+    def __init__(self, *args, **kwargs):
+        super(UserFormForm, self).__init__(*args, **kwargs)
+        # Set the patient_id field to be read-only
+        self.fields['patient_id'].widget.attrs['readonly'] = True
+        # Populate patient_id field with a random 5-digit number
+        self.initial['patient_id'] = random.randint(10000, 99999)
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Automatically set today's date for report_generation_date and scan_date
+        instance.report_generation_date = date.today()
+        instance.scan_date = date.today()
+
+        if commit:
+            instance.save()
+
+        return instance
+    
 def generate_random_patient_id(length=10):
     characters = string.digits
     return ''.join(random.choice(characters) for _ in range(length))

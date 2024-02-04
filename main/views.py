@@ -27,7 +27,6 @@ from .forms import DoctorRegistrationForm, DoctorLoginForm
 from django.contrib.auth import authenticate, get_user_model
 from .backends import UsernameOrMobileModelBackend
 from django.contrib import messages
-from .forms import PatientForm, CreditRequestForm
 import requests
 import json
 import os
@@ -55,8 +54,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 import json
+from .forms import CreditRequestForm
 import requests
 from .serializer import *
+from .forms import UserFormForm
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.views import TokenObtainPairView ,InvalidToken
 from rest_framework.permissions import IsAuthenticated
@@ -68,6 +69,17 @@ from django.db.models.functions import ExtractWeekDay
 from .temperature_cal import get_temperature_from_pixel
 from PIL import Image as PILImage
 from django.contrib.auth.decorators import login_required
+from django.core import serializers
+from .models import UserForm
+from .forms import UserFormForm
+from django.http import HttpResponseRedirect
+from reportlab.pdfgen import canvas
+from io import BytesIO
+from .models import UserForm
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.lib.styles import getSampleStyleSheet
 global_token=None
 check_user=None
 def save_token(token_value, user):
@@ -152,7 +164,7 @@ class confirmpassword(View):
             print(user_obj,'okok')
             user_obj.set_password(password)
             user_obj.save()
-            obj.delete()
+            obj.delete() 
             messages.success(request,f"Password updated successfully")
             # return HttpResponse("Passoword  Update  successfully")
             return render(request, "login.html",{'token':token})
@@ -165,55 +177,6 @@ class confirmpassword(View):
 def email_verification_sent(request):
     return render(request, 'email_verification_sent.html')
 
-# def doctor_register(request):
-#     if request.method == 'POST':
-#         form = DoctorRegistrationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             user.backend = 'main.UsernameOrMobileModelBackend'
-            
-#             # Generate a verification token and create a verification URL
-#             # token = default_token_generator.make_token(user)
-#             # uid = urlsafe_base64_encode(force_bytes(user.pk))
-#             # current_site = get_current_site(request)
-#             # verification_url = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
-
-#             # Generate a verification token and create a verification URL
-#             token = default_token_generator.make_token(user)
-#             uid = urlsafe_base64_encode(force_bytes(user.pk))
-#             current_site = Site.objects.get_current()
-#             verification_url = reverse('verify_email', kwargs={'uidb64': uid, 'token': token})
-
-
-#             print("uid:", uid)
-#             print("token:", token)
-
-
-
-            
-#             # Build the email subject and message
-#             subject = 'Verify your email address'
-#             message = render_to_string('email_verification_message.txt', {
-#                 'user': user,
-#                 'domain': current_site.domain,
-#                 'verification_url': verification_url,
-#             })
-#             # message="hello"
-#             # Send the verification email
-#             send_mail(subject, message, 'boredstuff2021@gmail.com', [user.email])
-            
-#             # Redirect to a page indicating that an email has been sent for verification
-#             return redirect('email_verification_sent.html')
-#         else:
-#             # Display error messages for form validation errors
-#             error_messages = ', '.join([f"{field}: {', '.join(errors)}" for field, errors in form.errors.items()])
-#             messages.error(request, f"Registration failed. {error_messages}")
-#     else:
-#         form = DoctorRegistrationForm()
-#     return render(request, 'register.html', {'form': form})
-
-# login
-# 2
 def doctor_login(request):
     if request.method == 'POST':
         form = DoctorLoginForm(data=request.POST)
@@ -250,9 +213,26 @@ def doctor_logout(request):
 # home page
 @login_required
 def home(request):
-    return render(request, 'operator/home.html')
+    if request.method == 'POST':
+        form = UserFormForm(request.POST)
+        if form.is_valid():
+            form.save()
+            print("It is saving")
+            return render(request, 'operator/upload-image.html')  # Customize the success template as needed
+        else:
+            print(form.errors)  # Print form errors for debugging
+    else:
+        # Set default values for date fields
+        default_values = {
+            'report_generation_date': timezone.now().date(),
+            'scan_date': timezone.now().date(),
+        }
+        form = UserFormForm(initial=default_values)
+        print("it is not saving")
+
+    return render(request, 'operator/home.html', {'form': form})
 # send credit requset data to admin home
-from django.core import serializers
+
 
 def credit_requset_list(request):
     # if request.method == 'GET':
@@ -303,7 +283,122 @@ def DoctorProfile(request):
     context={'doctor':doctor}
     return render(request, 'doctorpanel/doctor-profile.html', context)
 
+# To generate PDF 
 
+class GeneratePDFView(View):
+    def get(self, request, *args, **kwargs):
+        # Fetch the latest user form data
+        user_form_data = UserForm.objects.last()
+
+        # Get parameters from the request
+        param1 = request.GET.get('param1', 'Default Param 1')
+        param2 = request.GET.get('param2', 'Default Param 2')
+        param3 = request.GET.get('param3', 'Default Param 3')
+        param4 = request.GET.get('param4', 'Default Param 4')
+        param5 = request.GET.get('param5', 'Default Param 5')
+        param6 = request.GET.get('param6', 'Default Param 6')
+        param7 = request.GET.get('param7', 'Default Param 7')
+        param8 = request.GET.get('param8', 'Default Param 8')
+        param9 = request.GET.get('param9', 'Default Param 9')
+        param10 = request.GET.get('param10', 'Default Param 10')
+        param11 = request.GET.get('param11', 'Default Param 11')
+
+        # Create a BytesIO buffer to receive PDF data
+        buffer = BytesIO()
+
+        # Create the PDF object, using BytesIO as its "file"
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        # Define styles for the title and other elements
+        styles = getSampleStyleSheet()
+        title_style = styles['Title']
+        subtitle_style = styles['Heading2']
+        normal_style = styles['Normal']
+
+        # Define elements for the PDF content
+        elements = []
+
+        # Title: Breast Health Report
+        title_text = '<b><font size="16">Breast Health Report</font></b>'
+        elements.append(Paragraph(title_text, title_style))
+
+        # Patient ID to the right of the page
+        patient_id_content = f'<b>Patient ID: {user_form_data.patient_id}</b>'
+        elements.append(Paragraph(patient_id_content, normal_style))
+        elements.append(Spacer(1, 12))  # Add some space between elements
+        elements.append(Paragraph('<hr/>', normal_style))  # Add an HR line
+
+        # Sub-heading: General Details (in blue color)
+        general_details_text = '<font color="blue"><b>General Details</b></font>'
+        elements.append(Paragraph(general_details_text, subtitle_style))
+        # Horizontal line with light blue color
+        elements.append(HRFlowable(width="100%", color=colors.lightblue, thickness=3, spaceAfter=12))
+
+        # User Form Data without using a table
+        user_form_content = [
+            f'Name: {user_form_data.patient_name}',
+            f'Email: {user_form_data.patient_email}',
+            f'Doctor: {user_form_data.appointed_doctor}',
+            f'Center: {user_form_data.center}',
+            f'Age: {user_form_data.patient_age}',
+            f'Report Generation Date: {user_form_data.report_generation_date}',
+            f'Gender: {user_form_data.patient_gender}',
+            f'Scan Date: {user_form_data.scan_date}',
+        ]
+        for line in user_form_content:
+            elements.append(Paragraph(line, normal_style))
+            elements.append(Spacer(1, 6))  # Add some vertical space between lines
+        # Horizontal line with light blue color
+        elements.append(HRFlowable(width="100%", color=colors.lightblue, thickness=3, spaceAfter=12))
+        # Thermalytics Score
+        # Sub-heading: General Details (in blue color)
+        thermalytics_details_text = '<font color="blue"><b>Thermalytics Score</b></font>'
+        elements.append(Paragraph(thermalytics_details_text, subtitle_style))
+         # User Form Data without using a table
+        user_form_content = [
+            'Maximum Body Temperature:'f'{param6}°C',
+            'Minimum Body Temperature: 'f'{param7}°C',
+            'Aerolar Temperature Differences: 'f'{param10}°C',
+            'Aerolar Symmetry:' f'{param11}%',
+        ]
+        for line in user_form_content:
+            elements.append(Paragraph(line, normal_style))
+            elements.append(Spacer(1, 6))  # Add some vertical space between lines
+
+        thermalytics_details_text = '<font color="blue"><b>Thermal Analysis</b></font>'
+        elements.append(Paragraph(thermalytics_details_text, subtitle_style))
+        elements.append(HRFlowable(width="100%", color=colors.lightblue, thickness=3, spaceAfter=12))
+        # Parameters from thermal_parameters.html
+
+        parameters_content = [
+            ['Thermal Parameters', 'Thermal Analysis'],
+            ['Number of Hotspots', param1],
+            ['Temperature around blue', f'{param2}%'],
+            ['Hotspot Shape', param3],
+            ['Threshold', param4],
+            ['Extent of Hotspots', f'{param5}%'],
+        ]
+        parameters_table = Table(parameters_content, colWidths=[300, 120])
+        parameters_table.setStyle(TableStyle([
+            ('GRID', (0, 0), (-1, -1), 1, colors.lightblue),  # Light blue border for the table
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Black text color for the header
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center-align text in the table
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Center-align text vertically
+            ('INNERGRID', (0, 0), (-1, -1), 1, colors.lightblue),  # Light blue inner grid lines
+            ('BACKGROUND', (0, 0), (-1, 0), colors.white),  # White background for the header
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # White background for the content
+        ]))
+        elements.append(parameters_table)
+
+        # Build the PDF document
+        doc.build(elements)
+
+        # FileResponse sets the Content-Disposition header so that browsers
+        # present the option to save the file.
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="generated_pdf.pdf"'
+        return response
 # imran code
 @login_required
 def upload_image(request):
@@ -480,58 +575,8 @@ def analyze_thermal_image(image_path, output_path, calibration_image_path, thres
 
         # Save the resulting image instead of displaying it
     cv2.imwrite(output_path, thermal_image)
-# def analyze_thermal_image(image_path, output_path):
-#     image = cv2.imread(image_path)
-#     # Convert to grayscale
-#     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-#     # Convert to HSV for red color detection
-#     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-#     # Thresholds to identify the black boundary and the red hotspots
-#     _, black_mask = cv2.threshold(hsv[:, :, 2], 50, 255, cv2.THRESH_BINARY_INV)
-#     _, red_mask = cv2.threshold(hsv[:, :, 0], 150, 255, cv2.THRESH_BINARY)
 
-#     # Find contours in the black mask
-#     contours, _ = cv2.findContours(black_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-#     breast_contour = max(contours, key=cv2.contourArea)
-
-#     # Create a mask from the breast contour
-#     breast_mask = np.zeros_like(hsv[:, :, 0])
-#     cv2.drawContours(breast_mask, [breast_contour], -1, 255, -1)
-
-#     # Use the breast mask to isolate red regions within the black boundary
-#     red_within_breast = cv2.bitwise_and(red_mask, red_mask, mask=breast_mask)
-
-#     # Find contours of the red areas within the breast mask
-#     red_contours, _ = cv2.findContours(red_within_breast, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-#     # Convert to HSV for red color detection
-#     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
-#     # Define the range for red color
-#     # Adjust the range as necessary for your specific image
-#     lower_red = np.array([0, 120, 70])
-#     upper_red = np.array([10, 255, 255])
-#     lower_red2 = np.array([0, 120, 70])
-#     upper_red2 = np.array([10, 255, 255])
-
-#     # Create masks for the red color
-#     mask_red1 = cv2.inRange(hsv, lower_red, upper_red)
-#     mask_red2 = cv2.inRange(hsv, lower_red2, upper_red2)
-#     mask_red = cv2.add(mask_red1, mask_red2)
-
-#     # Use the breast mask to isolate red regions within the black boundary
-#     red_within_breast = cv2.bitwise_and(mask_red, mask_red, mask=breast_mask)
-
-#     # Find contours of the red areas within the breast mask
-#     red_contours, _ = cv2.findContours(red_within_breast, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-#     # Draw contours on the original image around the red areas
-#     cv2.drawContours(image, red_contours, -1, (255, 0, 0), 2)  # Blue lines for visibility
-
-#     # Save the resulting image instead of displaying it
-#     cv2.imwrite(output_path, image)
-def calculate_thermal_image(image_path, calibration_image_path):
+def calculate_thermal_image(image_path, calibration_image_path,threshold_temperature):
     # Load the calibration image
     calibration_image = cv2.imread(calibration_image_path)
     middle_column = calibration_image[:, calibration_image.shape[1] // 2, :]
@@ -562,7 +607,7 @@ def calculate_thermal_image(image_path, calibration_image_path):
         def map_color_to_temp_using_calibration(color, color_temp_mapping):
             color = np.asarray(color, dtype=np.uint8)
             distances = np.linalg.norm(color_temp_mapping['color'] - color, axis=1)
-            closest_index = np.argmin(distances)
+            closest_index = np.argmin(distances) 
             return color_temp_mapping['temp'][closest_index]
 
         # Load images
@@ -623,13 +668,15 @@ def calculate_thermal_image(image_path, calibration_image_path):
             # Map the color to the temperature
             temperature = map_color_to_temp_using_calibration(mean_color_rgb, color_temp_mapping)
             cross['temperature'] = temperature
-        
+        if len(crosses_info) < 2:
+            return None, None  # You can return default values or raise an exception if needed
         # Display the results
-        for cross in crosses_info:
-            diff = crosses_info[0]['temperature']-crosses_info[1]['temperature']
-            avg = (crosses_info[0]['temperature']+crosses_info[1]['temperature'])/2
-            ans = round(diff/avg,2) * 100
-            return diff,ans
+        else:
+            for cross in crosses_info:
+                diff = crosses_info[0]['temperature']-crosses_info[1]['temperature']
+                avg = (crosses_info[0]['temperature']+crosses_info[1]['temperature'])/2
+                ans = round(diff/avg,2) * 100
+                return diff,ans
 
     def calculate_roi_statistics(mask, image, calibration_column):
         roi_pixels = image[mask > 0]
@@ -712,12 +759,24 @@ def calculate_thermal_image(image_path, calibration_image_path):
     num_hotspots = len(red_contours)
     hotspot_area = sum(cv2.contourArea(cnt) for cnt in red_contours)
     roi_area = cv2.contourArea(breast_contour)
-    hotspot_extent = round((hotspot_area / roi_area) * 100, 2) if roi_area > 0 else 0
+    hotspot_extent = round((hotspot_area / roi_area) * 100, 2)*100 if roi_area > 0 else 0
     percentage = calculate_percentage(image_path)
     temperature_difference, shape_description = calculate_temperature_difference(hsv, calibration_column)
-    aerolar_symmetry, aerolar_difference = aerolar_difference(image_path, calibration_image_path)
+    aerolar_symmetry, aerolar_differences = aerolar_difference(image_path, calibration_image_path)
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Apply a threshold to get only the hot regions
+    _, thresh_image = cv2.threshold(gray_image, threshold_temperature, 255, cv2.THRESH_BINARY)
+
+    # Find contours in the thresholded image
+    contours, _ = cv2.findContours(thresh_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # Filter out small contours that may not be actual hotspots
+    min_contour_area = 50  # This value may need to be adjusted
+    hotspot_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > min_contour_area]
+
+    
+    
     parameters = {
-        "NumberofHotspots": num_hotspots,
+        "NumberofHotspots": len(hotspot_contours),
         "TemperatureDifferenceAroundBoundaries": temperature_difference,
         "HotspotShapes": shape_description,
         "ExtentofHotspots": hotspot_extent,
@@ -725,8 +784,8 @@ def calculate_thermal_image(image_path, calibration_image_path):
         "MinHotspotTemperature": min_temp,
         "MeanROITemperature": mean_temp,
         "PercentageofROI": percentage,
-        "temperaturedifference":round(aerolar_difference,2),
-        "AerolarSymmetry" : round(aerolar_symmetry,2)
+        "temperaturedifference":aerolar_differences,
+        "AerolarSymmetry" : aerolar_symmetry,
     }
 
     return parameters
@@ -766,242 +825,22 @@ def thermal_parameters(request):
             analyze_thermal_image(input_image_path, output_image_path,calibration_image_path,threshold_value)
 
             # Calculate thermal parameters
-            parameters = calculate_thermal_image(input_image_path, calibration_image_path)
+            parameters = calculate_thermal_image(input_image_path, calibration_image_path,threshold_value)
+            parameters = {key: float(value) if isinstance(value, np.float32) else value for key, value in parameters.items()}
             # Adding the threshold value inside the parameters
             parameters['threshold'] = threshold_value 
 
             # Create the URL for the processed image
-            processed_image_url = os.path.join(settings.MEDIA_URL, 'uploads', 'processed_thermal_image', output_image_name)
+            processed_image_url = os.path.join(settings.MEDIA_URL, 'uploads/', 'processed_thermal_image/', output_image_name)
 
             thermal_data.append({
                 'processed_image_url': processed_image_url,
                 'parameters': parameters
             })
+            
 
     context = {'thermal_data': thermal_data}
     return render(request, 'doctor/thermal_parameters.html', context)
-
-# def thermal_parameters(request):
-#     # Directory where the original images are stored
-#     input_directory_path = os.path.join(settings.MEDIA_ROOT, 'uploads', 'new_directory')
-    
-#     # Directory where you want to save the processed images
-#     processed_directory_path = os.path.join(settings.MEDIA_ROOT, 'uploads', 'processed_thermal_image')
-    
-    
-#     # Create the processed images directory if it doesn't exist
-#     if not os.path.exists(processed_directory_path):
-#         os.makedirs(processed_directory_path)
-    
-#     processed_images_urls = []
-    
-#     for filename in os.listdir(input_directory_path):
-#         if filename.endswith('.png'):  # Assuming you want to process PNG images
-#             input_image_path = os.path.join(input_directory_path, filename)
-#             output_image_name = f'processed_{filename}'
-#             output_image_path = os.path.join(processed_directory_path, output_image_name)
-
-#             # Process the image and save it in the new directory
-#             analyze_thermal_image(input_image_path, output_image_path)
-#             # Create the URL for the processed image
-#             processed_image_url = os.path.join(settings.MEDIA_URL, 'uploads', 'processed_thermal_image', output_image_name)
-#             processed_images_urls.append(processed_image_url)
-
-#     context = {'processed_images_urls': processed_images_urls}
-#     return render(request, 'myapp/thermal_parameters.html', context)
-
-# services (doctor)
-# def services(request):
-#     return render(request,'doctorpanel/services.html')
-
-# # upload Image (doctor)
-# # d = pd.read_csv("D:/maskottchen/zia-project/zia_project/dristieye/main/icd_codes.csv")
-# # d = pd.read_csv("C:/Users/user/Desktop/Django_project/zia_project/dristieye/main/icd_codes.csv")
-# # Get the base directory of your Django project
-# base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)) ) # Assuming this script is in the same folder as manage.py
-
-# # Construct the path to the CSV file in the "main" app directory
-# csv_file_path = os.path.join(base_dir, 'main', 'icd_codes.csv')
-# # Read the CSV file into a DataFrame
-# d = pd.read_csv(csv_file_path)
-
-# def uploadImages(request):
-#     api_responses = {
-#         "left_eye": {},
-#         "right_eye": {},
-#     }
-
-#     if request.method == 'POST':
-#         form = PatientForm(request.POST, request.FILES)     # Enabling forms to accept the file submitted by the user
-        
-#         if form.is_valid():
-
-#             current_user = request.user  # Get the currently logged-in doctor.
-#             print(request.user.id)
-            
-#             user_credit = Doctor.get_credit(current_user)  # Get the doctor's credit.
-#             print(user_credit, "USER CREDIT", current_user)
-            
-
-#             # Check if the user has enough credit to deduct
-#             if user_credit > 0:
-#                 patient_id = form.cleaned_data['patient_id']
-#                 patient_name = form.cleaned_data['patient_name']
-#                 diabetes_status = form.cleaned_data['diabetes_status']
-#                 diabetes_type = form.cleaned_data['diabetes_type']
-#                 ss =  form.cleaned_data['left_image']
-#                 rr=  form.cleaned_data['right_image']
-#                 # print(ss,rr)
-                
-#                 patient = form.save(commit=False)
-
-#                 patient.doctor = request.user
-
-#                 # print("------------------------",type(patient_id))
-                
-#                 patient.save()
-                
-#                 left_quality,left_analyze,right_quality,right_analyze = 0.0,0.0,0.0,0.0
-#                 try:
-#                     val = Patient.objects.get(patient_id=patient_id)
-#                     print(val, 'VAl')
-#                 except:
-#                     return render(request, 'same_id_error.html')
-                    
-#                 print(val.left_image, val.right_image)
-        
-#                 # Condition for left image
-#                 if val.left_image:
-#                     left_api_url = f'http://3.7.242.24:8006/quality_check?unique_id={patient_id}'
-#                     left_files = {'file': open(f"{val.left_image}", 'rb')}
-#                     left_response = requests.post(left_api_url, files=left_files)
-#                     api_responses["left_eye"]["quality_check"] = left_response.json()
-#                     # left_quality = float(left_response.json().get("model_coef"))  #should be used for comparison
-#                     try:
-#                         left_quality = float(left_response.json().get("model_coef"))
-#                     except ValueError:
-#                         # Handle the case when the value is 'NA' or not a valid float
-#                         left_quality = None
-
-
-#                     left_api_analyze_url = f'http://3.7.242.24:8000/dr_analyze?unique_id={patient_id}'
-#                     left_analyze_files = {'file': open(f"{val.left_image}", 'rb')}
-#                     left_analyze_response = requests.post(left_api_analyze_url, files=left_analyze_files)
-#                     print(left_analyze_response, 'left_analyze_response CHECK')
-#                     print(left_analyze_response.json(), 'left_analyze_response JSON')
-#                     left_analyze_data = left_analyze_response.json()
-                    
-#                     left_model_response = left_analyze_data["model_response"]
-#                     try:
-#                         left_analyze = float(left_analyze_response.json().get("model_coef"))         #should be used to compare with left_dr
-                    
-#                     except:
-#                         left_analyze = None
-#                     left_binary_response = left_analyze_data["binary_response"]
-
-#                 # Condition for right image
-#                 if val.right_image:
-#                     right_api_url = f'http://3.7.242.24:8006/quality_check?unique_id={int(patient_id)+1}'
-#                     right_files = {'file': open(f"{val.right_image}", 'rb')}
-#                     right_response = requests.post(right_api_url, files=right_files)
-#                     api_responses["right_eye"]["quality_check"] = right_response.json()
-#                     right_quality = float(right_response.json().get("model_coef"))     #should be used in comparison
-
-#                     right_api_analyze_url = f'http://3.7.242.24:8000/dr_analyze?unique_id={int(patient_id)+1}'
-#                     right_analyze_files = {'file': open(f"{val.right_image}", 'rb')}
-#                     right_analyze_response = requests.post(right_api_analyze_url, files=right_analyze_files)
-#                     right_analyze_data = right_analyze_response.json()
-
-#                     right_model_response = right_analyze_data["model_response"]
-#                     right_analyze = float(right_analyze_response.json().get("model_coef"))             #compared with the right_dr
-#                     right_binary_response = right_analyze_data["binary_response"]
-
-#                 report_data = {
-#                     'patient_id': patient_id,
-#                     'patient_name': patient_name,
-#                     'diabetes_status': diabetes_status,
-#                     'diabetes_type': diabetes_type,
-#                     'username': request.user.username,
-#                 }
-
-#                 # Handle the case where only a single image is uploaded
-#                 if val.left_image and not val.right_image:
-#                     report_data['left_model_response'] = left_model_response
-#                     report_data['left_model_coef'] = left_analyze
-#                     report_data['left_binary_response'] = left_binary_response
-#                     report_data['left_quality'] = left_quality
-#                     report_data['left_eye_image_path'] = f"{val.left_image}"
-#                     # print("for left")
-#                     # print(report_data['left_eye_image_path'])
-#                     report_data['right_eye_image_path'] = ""
-#                 elif val.right_image and not val.left_image:
-#                     report_data['right_model_response'] = right_model_response
-#                     report_data['right_model_coef'] = right_analyze
-#                     report_data['right_binary_response'] = right_binary_response
-#                     report_data['right_quality'] = right_quality
-#                     report_data['right_eye_image_path'] = f"{val.right_image}"
-#                     report_data['left_eye_image_path'] = ""
-#                 else:
-#                     report_data['left_model_response'] = left_model_response
-#                     report_data['left_model_coef'] = left_analyze
-#                     report_data['left_binary_response'] = left_binary_response
-#                     report_data['left_quality'] = left_quality
-#                     report_data['left_eye_image_path'] = f"{val.left_image}"
-#                     report_data['right_model_response'] = right_model_response
-#                     report_data['right_model_coef'] = right_analyze
-#                     report_data['right_binary_response'] = right_binary_response
-#                     report_data['right_quality'] = right_quality
-#                     report_data['right_eye_image_path'] = f"{val.right_image}"
-#                     print("for BOTH")
-#                     print(report_data['left_eye_image_path'])
-#                     print(report_data['right_eye_image_path'])
-                
-#                 #fetching data from ICD CODES
-#                 filtered_rows = d[
-#                     (d['right_dr'] == right_analyze) &
-#                     (d['right_dme'] == right_quality) &
-#                     (d['left_dr'] == left_analyze) &
-#                     (d['left_dme'] == left_quality)
-#                     ]
-                
-#                 summary = ''
-#                 icd_codes = ''
-#                 icd_desc = ''
-#                 left_result = ''
-#                 right_result = ''
-
-#                 for index, row in filtered_rows.iterrows():
-#                     summary = row['summary']
-#                     icd_codes = row['icd_codes']
-#                     icd_desc = row['icd_desc']
-#                     left_result = row['left_result']
-#                     right_result = row['right_result']
-#                 report_data['summary'] = summary
-#                 report_data['icd_codes'] = icd_codes
-#                 report_data['icd_desc'] = icd_desc
-#                 report_data['left_result'] = left_result
-#                 report_data['right_result'] = right_result
-
-#                 # Redirect to generate_report view with API responses
-#                 print(report_data, "REPORTS DETAILS")
-#                 try:
-#                     result= generate_report(request,api_responses, report_data)
-#                     print(result.status_code, 'RESULT')
-#                     if result.status_code==200:
-#                         current_user.remove_credit() 
-#                         print('AFTER DELETE', current_user.credit_val)
-#                     return result
-#                 except Exception as e:
-#                     print('ERROR WHILE CREATING REPORT', e)
-#                     val.delete()
-#                     return render(request, 'mail_error.html')
-#             else:
-#                 # User has zero credit, display a message
-#                 return render(request, 'doctorpanel/recharge.html')
-
-#     else:
-#         form = PatientForm()
-#     return render(request,'doctorpanel/uploadImage.html',{'form': form})
 
 
 
@@ -1055,158 +894,6 @@ class  ImageprocessViewAPI(ModelViewSet):
         name = serializer.validated_data.get('name')
         print(name)
 
-        # email = serializer.validated_data.get('email')
-        # diabetes_status = serializer.validated_data.get('diabetes_status')
-        # diabetes_type = serializer.validated_data.get('diabetes_type')
-        # left_eye = serializer.validated_data.get('left_eye')
-        # right_eye = serializer.validated_data.get('right_eye')
-        # token = serializer.validated_data.get('check_token')
-        # print(get_saved_token, 'GOTIT')
-        # second_value, current_user=get_saved_token()
-        # print(second_value, 'GOTIT', current_user)
-        # user_credit = Doctor.get_credit(current_user)  # Get the doctor's credit.
-        # print(user_credit, "USER CREDIT", current_user)
-        # if token==second_value:
-            
-        #     patient_id=generate_random_patient_id()
-        #     # print(left_eye)
-        #     # print(type(left_eye))
-
-        #     api_responses = {
-        #     "left_eye": {},
-        #     "right_eye": {},}
-        #     left_quality,left_analyze,right_quality,right_analyze = 0.0,0.0,0.0,0.0
-        #     if left_eye is None and right_eye is None:
-                
-        #         return Response(
-        #         {"message": "No single images found"})
-
-        #     if left_eye:
-        #         left_api_url = f'http://3.7.242.24:8006/quality_check?unique_id={patient_id}'
-        #         # left_files = {'file': open(f"{left_eye}", 'rb')}
-        #         left_files = {'file': left_eye}
-        #         left_response = requests.post(left_api_url, files=left_files)
-        #         print(left_response.json(), 'JSON')
-        #         print(left_response.json().get("model_coef"), 'JSONlp')
-        #         api_responses["left_eye"]["quality_check"] = left_response.json()
-        #         try:
-        #             left_quality = float(left_response.json().get("model_coef"))
-        #             # print(left_quality,'TEST')
-        #         except ValueError:
-        #             left_quality = 0.0
-
-        #         left_api_analyze_url = f'http://3.7.242.24:8000/dr_analyze?unique_id={patient_id}'
-        #         # left_analyze_files = {'file': open(f"{left_eye}", 'rb')}
-        #         left_analyze_files = {'file': left_eye}
-        #         left_analyze_response = requests.post(left_api_analyze_url, files=left_analyze_files)
-        #         left_analyze_data = left_analyze_response.json()
-
-        #         left_model_response = left_analyze_data["model_response"]
-        #         try:
-        #             left_analyze = float(left_analyze_response.json().get("model_coef"))
-        #         except ValueError:
-        #             left_analyze=0.0
-        #         left_binary_response = left_analyze_data["binary_response"]
-
-        #     if right_eye:
-        #         right_api_url = f'http://3.7.242.24:8006/quality_check?unique_id={int(patient_id) + 1}'
-        #         right_files = {'file': right_eye}
-        #         right_response = requests.post(right_api_url, files=right_files)
-        #         api_responses["right_eye"]["quality_check"] = right_response.json()
-        #         right_quality = float(right_response.json().get("model_coef"))
-
-        #         right_api_analyze_url = f'http://3.7.242.24:8000/dr_analyze?unique_id={int(patient_id) + 1}'
-        #         right_analyze_files = {'file':right_eye}
-        #         right_analyze_response = requests.post(right_api_analyze_url, files=right_analyze_files)
-        #         right_analyze_data = right_analyze_response.json()
-
-        #         right_model_response = right_analyze_data["model_response"]
-        #         try:
-        #             right_analyze = float(right_analyze_response.json().get("model_coef"))
-        #         except:
-        #             right_analyze=0.0
-        #         right_binary_response = right_analyze_data["binary_response"]
-
-        #     report_data = {
-        #         'patient_id': patient_id,
-        #         'patient_name': name,
-        #         'diabetes_status': diabetes_status,
-        #         'diabetes_type': diabetes_type,
-        #         # 'username': request.user.username,
-        #     }
-
-        #     if left_eye and not right_eye:
-        #         report_data['left_model_response'] = left_model_response
-        #         report_data['left_model_coef'] = left_analyze
-        #         report_data['left_binary_response'] = left_binary_response
-        #         report_data['left_quality'] = left_quality
-        #         # report_data['left_eye_image_path'] = left_eye
-        #         # report_data['right_eye_image_path'] = ""
-        #     elif right_eye and not left_eye:
-        #         report_data['right_model_response'] = right_model_response
-        #         report_data['right_model_coef'] = right_analyze
-        #         report_data['right_binary_response'] = right_binary_response
-        #         report_data['right_quality'] = right_quality
-        #         # report_data['right_eye_image_path'] = right_eye
-        #         # report_data['left_eye_image_path'] = ""
-        #     else:
-        #         report_data['left_model_response'] = left_model_response
-        #         report_data['left_model_coef'] = left_analyze
-        #         report_data['left_binary_response'] = left_binary_response
-        #         report_data['left_quality'] = left_quality
-        #         # report_data['left_eye_image_path'] = left_eye
-        #         report_data['right_model_response'] = right_model_response
-        #         report_data['right_model_coef'] = right_analyze
-        #         report_data['right_binary_response'] = right_binary_response
-        #         report_data['right_quality'] = right_quality
-        #         # report_data['right_eye_image_path'] = right_eye
-
-        #     # Rest of your code for generating reports
-        #     #fetching data from ICD CODES
-        #     # d = pd.read_csv(csv_file_path)
-        #     # print(left_quality,left_analyze,right_quality,right_analyze)
-        #     # print(d)
-        #     filtered_rows = d[
-        #         (d['right_dr'] == right_analyze) &
-        #         (d['right_dme'] == right_quality) &
-        #         (d['left_dr'] == left_analyze) &
-        #         (d['left_dme'] == left_quality)
-        #         ]
-            
-        #     summary = ''
-        #     icd_codes = ''
-        #     icd_desc = ''
-        #     left_result = ''
-        #     right_result = ''
-        #     # print(filtered_rows, 'filtered_rows')
-
-        #     for index, row in filtered_rows.iterrows():
-        #         summary = row['summary']
-        #         icd_codes = row['icd_codes']
-        #         icd_desc = row['icd_desc']
-        #         left_result = row['left_result']
-        #         right_result = row['right_result']
-        #     report_data['summary'] = summary
-        #     report_data['icd_codes'] = icd_codes
-        #     report_data['icd_desc'] = icd_desc
-        #     report_data['left_result'] = left_result
-        #     report_data['right_result'] = right_result
-
-        #     print(report_data,'kll')
-
-        #     if user_credit>0:
-        #         current_user.remove_credit() 
-        #         print('AFTER API USED CREDIT', current_user.credit_val)
-        #         # return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
-        #     else:
-        #         return render(request, 'doctorpanel/recharge.html')
-        #     return Response(report_data)
-        # else:
-        return Response(
-            {"message": name}
-        )
-
-#API TO REPORT DATAfrom django.http import JsonResponse
 
 # reportgenerator
 def generate_report(request, api_responses,report_data):

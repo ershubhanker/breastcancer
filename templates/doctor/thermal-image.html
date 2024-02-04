@@ -276,6 +276,15 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
+        #content{
+          transition: margin-left 0.3s ease-in-out;
+          padding: 20px;
+          margin-left: 0px;
+          z-index: 1;
+        }
+        #img{
+          vertical-align: bottom;
+        }
         .content-container {
             display: flex;
             justify-content: center; 
@@ -309,27 +318,30 @@
         }
         #toggle{
             position: absolute;
-            background-color: rgb(148, 148, 152);
+            background-color: rgb(159, 6, 254);
+            border-radius: 5px;
             position: absolute; /* Position the button absolutely relative to its parent */
-            right: 20%; /* Align to   the far right */
+            right: 80%; /* Align to   the far right */
             top: 10%; /* Position at the middle vertically */
             transform: translate(-100%, -50%); /* Adjust the button's position to be centered vertically */
+            border-color: white
         }
         .gray-scale {
             filter: grayscale(100%); /* This will make the image grayscale */
         }
          /* Additional Styles for Hotspot Threshold Box */
         .hotspot-threshold {
-            background-color: white; /* Set your preferred background color */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Shadow effect */
-            padding: 20px; /* Padding inside the box */
-            text-align: center; /* Center align the elements */
-            width: 200px; /* Width of the box */
-            margin: 0 20px; /* Center the box on the page */
-            margin-top: 20px; /* Margin from the top */
-            margin-right: 20px; 
-            flex: 0 0 auto; /* Don't grow, don't shrink, initial basis auto */
+          background-color: white;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          padding: 20px;
+          text-align: center;
+          width: 200px;
+          margin: 0 20px;
+          margin-top: 20px;
+          margin-right: 80px;
+          flex: 0 0 auto;
+          box-sizing: content-box;/*grow, don't shrink, initial basis auto */
         }
         .hotspot-threshold input {
             margin-bottom: 10px; /* Space between input and button */
@@ -576,12 +588,12 @@
                         <label for="threshold">Hotspot Threshold:</label>
                         <input type="text" id="threshold" name="threshold" value="34.1">
                         <button onclick="saveThreshold()">Save</button>
+                        <span id="temperature-display" style="margin-top: 10px; display: block;">Temperature: 0.0 C</span>
                     </div>
                     {% if annotated_images %}
                    
                     <div id="main-image-container">
                         <img id="main-image" src="{{ annotated_images.0 }}" alt="Main Image">
-                        <span id="temperature-display">Temperature: --</span>
                         <button id="toggle">Toggle</button>
                     </div>
                 </div>

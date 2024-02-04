@@ -4,12 +4,12 @@ from  django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import SetPasswordForm
 from django.conf import settings
 from django.conf.urls.static import static
-
+from .views import home
 from django.contrib.auth.views import PasswordResetConfirmView
 from rest_framework.routers import DefaultRouter
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from .views import GeneratePDFView
 
 router = DefaultRouter()
 router.register("api/upload-images", views.ImageprocessViewAPI, basename="upload-images")
@@ -25,7 +25,8 @@ urlpatterns = [
     path('register/', views.doctor_register, name='doctor_register'),
     path('', views.doctor_login, name='doctor_login'),
     path('logout/', views.doctor_logout, name='doctor_logout'),
-
+    # Generate pdf
+    path('generate-pdf/', GeneratePDFView.as_view(), name='generate_pdf'),
     # home pages
     path('home/', views.home, name='home'),
     # path('operator-home/', views.operator_home, name = "operator-home"),
@@ -45,7 +46,6 @@ urlpatterns = [
     path('thermal-image/', views.thermal_image_view, name='thermal_image'),
     path('save_threshold/', views.save_threshold, name='save_threshold'),
     path('thermal-parameters/', views.thermal_parameters, name='thermal_parameters'),
-
     #doctor-dashboard
     path('index/', views.index, name = "index"),
     #doctor-profile

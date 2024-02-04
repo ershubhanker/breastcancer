@@ -1,22 +1,56 @@
 from django.utils import timezone
-
 # Create your models here.
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser,User
 from django.db import models
 import uuid
 from django.http import request
+import random
+from django.db import models
+from django.conf import settings
+
+class Assignment(models.Model):
+    operator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='operator_assignments')
+    doctor = models.ForeignKey('Doctor', on_delete=models.CASCADE, related_name='doctor_assignments')
+
 
 Operator =(  
     ("Operator", "Operator"), 
     ("Doctor", "Doctor"), 
 )
 
+
+class UserForm(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Others', 'Others'),
+    ]
+
+    CENTER_CHOICES = [
+        ('Mumbai', 'Mumbai'),
+        ('Pune', 'Pune'),
+        ('Nagpur', 'Nagpur'),
+    ]
+
+    patient_id = models.IntegerField(primary_key=True, default=random.randint(10000, 99999), unique=True)
+    patient_name = models.CharField(max_length=255)
+    patient_email = models.EmailField()
+    appointed_doctor = models.CharField(max_length=255)
+    patient_age = models.IntegerField()
+    patient_gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    center = models.CharField(max_length=50, choices=CENTER_CHOICES)
+    report_generation_date = models.DateField()
+    scan_date = models.DateField()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 class Image(models.Model):
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='uploads/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     is_annotated = models.BooleanField(default=False)
     temperature_data = models.JSONField(null =True, blank=True)
+    assigned_doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True)
 
 class Doctor(AbstractUser):
     fullname = models.CharField(max_length=100, null=True, blank=True)
@@ -51,8 +85,7 @@ class Doctor(AbstractUser):
     def remove_credit(self):
         self.credit_val -= 1
         self.save()
-
-        
+  
 class CreditRequest(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     request_date = models.DateTimeField(auto_now_add=True)
