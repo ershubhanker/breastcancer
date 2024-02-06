@@ -182,7 +182,6 @@ def doctor_login(request):
         form = DoctorLoginForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            print(f"User geeks_field: {user.geeks_field}")
             design = user.geeks_field
             if design == "Operator":
                 login(request, user)
@@ -217,7 +216,6 @@ def home(request):
         form = UserFormForm(request.POST)
         if form.is_valid():
             form.save()
-            print("It is saving")
             return render(request, 'operator/upload-image.html')  # Customize the success template as needed
         else:
             print(form.errors)  # Print form errors for debugging
@@ -228,7 +226,6 @@ def home(request):
             'scan_date': timezone.now().date(),
         }
         form = UserFormForm(initial=default_values)
-        print("it is not saving")
 
     return render(request, 'operator/home.html', {'form': form})
 # send credit requset data to admin home
@@ -358,6 +355,8 @@ class GeneratePDFView(View):
         user_form_content = [
             'Maximum Body Temperature:'f'{param6}°C',
             'Minimum Body Temperature: 'f'{param7}°C',
+            'Mean ROI Temperature: 'f'{param8}°C',
+            'Percentage of ROI: 'f'{param9}%',
             'Aerolar Temperature Differences: 'f'{param10}°C',
             'Aerolar Symmetry:' f'{param11}%',
         ]
@@ -400,22 +399,33 @@ class GeneratePDFView(View):
         response['Content-Disposition'] = 'attachment; filename="generated_pdf.pdf"'
         return response
 # imran code
+
+from .models import Image, Assignment, Doctor
+
 @login_required
 def upload_image(request):
     if request.method == 'POST':
-        # Get the name of the image from the POST data. The name attributes of the input fields in the HTML are the keys.
         image_field_name = next(iter(request.FILES))
         image_file = request.FILES.get(image_field_name)
 
         if image_file:
-            # Save the image under the appropriate title
-            Image.objects.create(title=image_field_name.replace('_', ' ').capitalize(), image=image_file)
+            # Create the image instance without saving to DB
+            new_image = Image(title=image_field_name.replace('_', ' ').capitalize(), 
+                              image=image_file, 
+                              uploader=request.user)
+
+            # Logic to assign the image to a doctor
+            # This is a placeholder, replace with your actual logic
+            assignment = Assignment.objects.filter(operator=request.user).first()
+            if assignment:
+                new_image.assigned_doctor = assignment.doctor
+                print(new_image.assigned_doctor)
+                # Save the image instance to DB
+            new_image.save()
             messages.success(request, "Image uploaded successfully.") 
             return redirect('upload-image')
 
-    # If not POST or if no file is selected, render the page with the form
     return render(request, 'operator/upload-image.html')
-
 def delete_image(request, image_id):
     image = get_object_or_404(Image, pk=image_id)
 
@@ -432,8 +442,16 @@ def delete_image(request, image_id):
 @login_required
 def annotate_image(request):
     images = Image.objects.all()
-    images = Image.objects.filter(is_annotated=False)
-    return render(request, 'doctor/annotate-image.html', {'images': images})
+    images = Image.objects.filter(assigned_doctor=request.user, is_annotated=False)
+    if images:
+        return render(request, 'doctor/annotate-image.html', {'images': images})
+    else:
+        # If there are no images, you might want to display a message in the template
+        # or redirect to another page with a message.
+        context = {'message': 'No images to annotate'}
+        return render(request, 'doctor/annotate-image.html', context)
+
+    
 @csrf_exempt
 @login_required
 def save_annotated_image(request):
@@ -494,16 +512,10 @@ def thermal_image_view(request):
 
     # Handling the request to display the page with images
     else:
-        # Directory where annotated images are stored
-        annotated_images_dir = os.path.join(settings.MEDIA_ROOT, 'uploads', 'new_directory')
+        annotated_images = Image.objects.filter(assigned_doctor=request.user, is_annotated=True)
 
-        # List all files in the annotated images directory
-        annotated_image_files = os.listdir(annotated_images_dir)
-
-        annotated_image_urls = [
-        os.path.join(settings.MEDIA_URL, 'uploads/', 'new_directory/', filename)
-        for filename in annotated_image_files if filename.endswith('.png')
-        ]
+        # Generate URLs for these images
+        annotated_image_urls = [os.path.join(settings.MEDIA_URL, image.image.name) for image in annotated_images]
 
         # Render the template with the image URLs
         return render(request, 'doctor/thermal-image.html', {'annotated_images': annotated_image_urls})
@@ -763,6 +775,7 @@ def calculate_thermal_image(image_path, calibration_image_path,threshold_tempera
     percentage = calculate_percentage(image_path)
     temperature_difference, shape_description = calculate_temperature_difference(hsv, calibration_column)
     aerolar_symmetry, aerolar_differences = aerolar_difference(image_path, calibration_image_path)
+    aerolar_symmetry = f'{round(aerolar_symmetry,2):.2f}'
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Apply a threshold to get only the hot regions
     _, thresh_image = cv2.threshold(gray_image, threshold_temperature, 255, cv2.THRESH_BINARY)
@@ -770,7 +783,7 @@ def calculate_thermal_image(image_path, calibration_image_path,threshold_tempera
     # Find contours in the thresholded image
     contours, _ = cv2.findContours(thresh_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     # Filter out small contours that may not be actual hotspots
-    min_contour_area = 50  # This value may need to be adjusted
+    min_contour_area = 100  # This value may need to be adjusted
     hotspot_contours = [cnt for cnt in contours if cv2.contourArea(cnt) > min_contour_area]
 
     
@@ -798,34 +811,37 @@ def save_threshold(request):
         return JsonResponse({'status': 'success', 'threshold': threshold_value})
     else:
         return JsonResponse({'status': 'error', 'message': 'No threshold value received'}, status=400)
+@login_required
 def thermal_parameters(request):
     threshold_value = request.session.get('threshold_value', 34)
-    # Directory where the original images are stored
-    input_directory_path = os.path.join(settings.MEDIA_ROOT, 'uploads', 'new_directory')
+
+    # Get images assigned to the logged-in doctor and that have been processed
+    assigned_images = Image.objects.filter(assigned_doctor=request.user, is_annotated=True)
 
     # Directory where you want to save the processed images
     processed_directory_path = os.path.join(settings.MEDIA_ROOT, 'uploads', 'processed_thermal_image')
 
     # Calibration image path
     calibration_image_path = os.path.join(settings.MEDIA_ROOT, 'media/new_directory', 'callibaration_image.png')
-    # calibration_image_path = os.listdir(media/new_directory)
+
     # Create the processed images directory if it doesn't exist
     if not os.path.exists(processed_directory_path):
         os.makedirs(processed_directory_path)
     
     thermal_data = []
 
-    for filename in os.listdir(input_directory_path):
+    for image in assigned_images:
+        filename = image.image.name.split('/')[-1]
         if filename.endswith('.png'):  # Assuming you want to process PNG images
-            input_image_path = os.path.join(input_directory_path, filename)
+            input_image_path = os.path.join(settings.MEDIA_ROOT, image.image.name)
             output_image_name = f'processed_{filename}'
             output_image_path = os.path.join(processed_directory_path, output_image_name)
 
             # Process the image and save it in the new directory
-            analyze_thermal_image(input_image_path, output_image_path,calibration_image_path,threshold_value)
+            analyze_thermal_image(input_image_path, output_image_path, calibration_image_path, threshold_value)
 
             # Calculate thermal parameters
-            parameters = calculate_thermal_image(input_image_path, calibration_image_path,threshold_value)
+            parameters = calculate_thermal_image(input_image_path, calibration_image_path, threshold_value)
             parameters = {key: float(value) if isinstance(value, np.float32) else value for key, value in parameters.items()}
             # Adding the threshold value inside the parameters
             parameters['threshold'] = threshold_value 
@@ -837,12 +853,9 @@ def thermal_parameters(request):
                 'processed_image_url': processed_image_url,
                 'parameters': parameters
             })
-            
 
     context = {'thermal_data': thermal_data}
     return render(request, 'doctor/thermal_parameters.html', context)
-
-
 
 class GetJwtToken(APIView):
     global check_token

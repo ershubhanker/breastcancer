@@ -323,6 +323,11 @@
     margin-bottom: 10px;
     padding-right: 20%;
     }
+    .generate-pdf{
+      border-radius: 2px;
+      background-color: #ff3300;
+      color: #f0f0f0;
+    }
     </style>
     <!-- Helpers -->
     <script src="{% static '/assets/js/config.js' %}"></script>
@@ -718,9 +723,9 @@
                 <img src="{{ thermal_data.4.processed_image_url }}" alt="Processed Thermal Image">
               </div>
             </div>
-          </div>
-          <div class = "generate_pdf">
-            <a href="{% url 'generate_pdf' %}?param1={{ thermal_data.0.parameters.NumberofHotspots }}&param2={{ thermal_data.0.parameters.TemperatureDifferenceAroundBoundaries }}&param3={{ thermal_data.0.parameters.HotspotShapes }}&param4={{ thermal_data.0.parameters.threshold }}&param5={{ thermal_data.0.parameters.ExtentofHotspots }}&param6={{ thermal_data.0.parameters.MaxHotspotTemperature }}&param7={{ thermal_data.0.parameters.MinHotspotTemperature }}&param8={{ thermal_data.0.parameters.MeanROITemperature }}&param9={{ thermal_data.0.parameters.PercentageofROI }}&param10={{ thermal_data.0.parameters.temperaturedifference }}&param11={{ thermal_data.0.parameters.AerolarSymmetry }}">Generate PDF</a>
+            <div class = "generate_pdf" style="padding-left: 0%;">
+              <button class="generate-pdf"><a href="{% url 'generate_pdf' %}?param1={{ thermal_data.0.parameters.NumberofHotspots }}&param2={{ thermal_data.0.parameters.TemperatureDifferenceAroundBoundaries }}&param3={{ thermal_data.0.parameters.HotspotShapes }}&param4={{ thermal_data.0.parameters.threshold }}&param5={{ thermal_data.0.parameters.ExtentofHotspots }}&param6={{ thermal_data.0.parameters.MaxHotspotTemperature }}&param7={{ thermal_data.0.parameters.MinHotspotTemperature }}&param8={{ thermal_data.0.parameters.MeanROITemperature }}&param9={{ thermal_data.0.parameters.PercentageofROI }}&param10={{ thermal_data.0.parameters.temperaturedifference }}&param11={{ thermal_data.0.parameters.AerolarSymmetry }}">Generate PDF</a></button>
+            </div>
           </div>
             <script>
               function toggleParagraph(paraId, imageIndex) {

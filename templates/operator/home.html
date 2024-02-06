@@ -97,107 +97,88 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{% static '/assets/js/config.js' %}"></script>
     <style>
-      .container{
-          display: flex;
-      }
-      form {
-        /* Maintain your existing styles */
-        width: 100%;
-        max-width: 1200px;
-        display: inline-block;
-        margin: 20px; /* Add margin for better spacing */
-        padding: 40px;
-        background-color: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-      }
-    
-      label {
-        /* Adjust label styles */
-        display: inline-block; /* Labels will appear on the same line as the input */
-        width: 150px; /* Set a fixed width for labels, adjust as needed */
-        font-size: 18px;
-        margin-bottom: 10px;
-        color: #333;
-      }
-    
-      input[type="text"],
-      input[type="email"],
-      select,
-      input[type="file"] {
-        /* Maintain your existing input styles */
-        width: calc(100% - 10px); /* Adjust width to leave space for border */
-        padding: 10px;
-        display: inline-block;
-        border: 2px solid #ccc;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        box-sizing: border-box;
-        font-size: 16px;
-      }
-    
-      .btn-primary {
-        /* Maintain your existing button styles */
-        background-color: #0479ff;
-        color: #fff;
-        border: 3px solid #0479ff;
-        border-radius: 30px;
-        padding: 15px 20px;
-        cursor: pointer;
-        font-size: 18px;
-      }
-    
-      button {
-        /* Maintain your existing button styles */
-        background-color: #0479ff;
-        color: #fff;
-        border: 2px solid #0479ff;
-        border-radius: 40px;
-        padding: 5px 10px;
-        cursor: pointer;
-        font-weight: bold;
-      }
-    
-      button:hover {
-        /* Maintain your existing button hover styles */
-        background-color: #0361d8;
-        border-color: #0361d8;
-      }
-    
-      #status {
-        /* Maintain your existing status styles */
-        margin-top: 10px;
-        color: #0479ff;
-      }
-    
-      /* Additional styles for image upload section */
-      .image-upload {
-        margin-top: 20px;
-      }
-    
-      .image-upload label {
-        width: auto;
-        margin-bottom: 0;
-      }
-    
-      .image-upload input[type="file"] {
-        width: auto;
-        margin-top: 10px;
-      }
-      .image-upload {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between; /* Align items with space in between */
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Center the items */
+        gap: 15px; /* Add a gap between rows and columns */
     }
-  
-    .image-upload label {
-      flex: 1; /* Take up equal width */
-      margin-right: 10px; /* Add spacing between labels */
+    
+    form {
+        width: calc(100% - 40px); /* Full width minus padding */
+        max-width: 650px; /* Maximum width of the form */
+        margin: 0 auto; /* Center the form in the viewport */
+        padding: 20px; /* Padding inside the form */
+        background-color: #ffffff; /* White background for the form */
+        border-radius: 16px; /* Rounded corners for the form */
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); /* Light shadow for depth */
     }
-  
+    
+    form label {
+        display: block; /* Ensure labels are block-level elements */
+        margin-bottom: 5px; /* Margin below the label */
+        color: #333; /* Dark grey color for the text */
+        font-size: 14px; /* Slightly smaller font size */
+    }
+    
+    form input[type="text"],
+    form input[type="email"],
+    form select,
+    form input[type="file"] {
+        width: 100%; /* Full width of the container */
+        padding: 8px; /* Padding inside the input fields */
+        border: 1px solid #ccc; /* Light grey border */
+        border-radius: 4px; /* Slightly rounded corners */
+        margin-bottom: 15px; /* Margin below each field */
+    }
+    
+    .form-header {
+        background-color: #0ecae7; /* Blue background for the header */
+        color: white; /* White text color */
+        padding: 10px; /* Padding inside the header */
+        border-top-left-radius: 10px; /* Rounded top-left corner */
+        border-top-right-radius: 10px; /* Rounded top-right corner */
+        font-size: 18px; /* Larger font size for the header */
+    }
+    
+    .submit-btn {
+        background-color: #ff6347; /* Red background for the submit button */
+        color: white; /* White text color */
+        border: none; /* No border */
+        padding: 10px 20px; /* Padding inside the button */
+        border-radius: 5px; /* Slightly rounded corners for the button */
+        font-size: 16px; /* Font size for the button */
+        width: auto; /* Auto width based on content */
+        display: block; /* Display as block to fill the width */
+        margin: 0 auto; /* Center the button */
+    }
+    
+    .submit-btn:hover {
+        background-color: #ff5237; /* Slightly darker red on hover */
+    }
+    
+    /* Adjusting the file inputs */
     .image-upload input[type="file"] {
-      flex: 2; /* Take up more width for the input */
+        width: auto; /* Auto width based on content */
+        padding: 5px; /* Smaller padding for file inputs */
     }
+    
+    /* Adjusting the form layout to match the design */
+    .form-left,
+    .form-right {
+        display: inline-block; /* Display side by side */
+        vertical-align: top; /* Align at the top */
+        width: calc(50% - 10px); /* Split width with a small gap */
+    }
+    
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+        .form-left,
+        .form-right {
+            width: 100%; /* Full width on small screens */
+            margin-bottom: 15px; /* Margin below on small screens */
+        }
+    }     
     </style>
   </head>
 
@@ -409,24 +390,21 @@
             <!-- Content -->
             <!-- User Form -->
             <section class="section main-section">
-              <div class="card mb-6">
-                  <header class="card-header">
-                      <p class="card-header-title">
-                          <span class="icon"><i class="mdi mdi-ballot"></i></span>
-                          USER FORM
-                      </p>
-                  </header>
-                  <div class="card-content">
-                      <form method="post" enctype="multipart/form-data" onsubmit="showSpinner()">
-                          {% csrf_token %}
-                          {{ form.as_p }}
-                          <button type="submit" id="submitBtn" class="btn-primary text-white ml-72 px-5 mt-8">Submit</button>
+              <div class="form-container">
+                  <div class="form-header">
+                      <h2>User Form</h2>
+                  </div>
+                  <form method="post" enctype="multipart/form-data" onsubmit="showSpinner()">
+                      {% csrf_token %}
+                      {{ form.as_p }}
+                      <div class="form-footer">
+                          <button type="submit" id="submitBtn" class="submit-btn">Submit</button>
                           <span id="loading" style="display: none;">Loading...</span>
                           <p id="status">{{status}}</p>
-                      </form>
-                  </div>
+                      </div>
+                  </form>
               </div>
-          </section>
+            </section>
             <!-- / Content -->
 
             <!-- Footer -->

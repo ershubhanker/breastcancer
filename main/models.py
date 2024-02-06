@@ -51,7 +51,7 @@ class Image(models.Model):
     is_annotated = models.BooleanField(default=False)
     temperature_data = models.JSONField(null =True, blank=True)
     assigned_doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True)
-
+    uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='uploaded_images')
 class Doctor(AbstractUser):
     fullname = models.CharField(max_length=100, null=True, blank=True)
     specialty = models.CharField(max_length=100, null=True, blank=True)
