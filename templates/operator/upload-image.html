@@ -16,8 +16,6 @@
         <div id="sidebar" class="active">
             <div class="sidebar-header">Breast Cancer</div>
             <ul class="sidebar-menu">
-                <li><a href="{% url 'home' %}"><i class="icon-home"></i> Home</a></li>
-                <li><a href="{% url 'upload-image' %}"><i class="icon-user"></i> Upload Image</a></li>
         </div>
         
         <div class="container">
@@ -109,7 +107,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Dashboard - Analytics | myTherma</title>
 
     <meta name="description" content="" />
 
@@ -146,6 +144,86 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{% static '/assets/js/config.js' %}"></script>
+    <style>
+      /* Improve form container */
+      .form-container {
+        max-width: 750px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    
+      /* Form title styling */
+      h2 {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 2rem;
+        color: #333;
+      }
+    
+      /* Form row and form group styling */
+      .form-row {
+        display: flex;
+        margin-bottom: 1rem;
+        gap: 1rem;
+      }
+      
+      /* Input and select styling */
+      input[type="text"],
+      input[type="email"],
+      input[type="date"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+      }
+    
+
+    
+      /* File input box styling */
+      .file-box {
+        border: 1px dashed #ccc;
+        padding: 1rem;
+        text-align: center;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+      }
+    
+      .file-box input[type="file"] {
+        margin-top: 0.5rem;
+      }
+    
+      /* Submit button styling */
+      .upload-btn {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+    
+      .upload-btn:hover {
+        background-color: #0056b3;
+      }
+    
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .form-row {
+          flex-direction: column;
+        }
+      }
+    </style>
   </head>
 
   <body>
@@ -156,7 +234,7 @@
 
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
           <div class="app-brand demo">
-            <a href="index.html" class="app-brand-link">
+            <a href="{% url 'index' %}" class="app-brand-link">
               <span class="app-brand-logo demo">
                 <svg
                   width="25"
@@ -212,7 +290,7 @@
                   </g>
                 </svg>
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">Sneat</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2", style="text-transform: none;">myTherma</span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -225,10 +303,6 @@
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
             <li class="menu-item active">
-              <a href="{% url 'home' %}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Dashboard">Operator Form</div>
-              </a>
               <a href="{% url 'upload-image' %}" class="menu-link mt-1" >
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Upload Images</div>
@@ -303,34 +377,10 @@
                             </div>
                           </div>
                           <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">John Doe</span>
-                            <small class="text-muted">Admin</small>
+                            <span class="fw-semibold d-block">{{ user.username }}</span>
+                            <small class="text-muted">{{ user.geeks_field }}</small>
                           </div>
                         </div>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="bx bx-user me-2"></i>
-                        <span class="align-middle">My Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="bx bx-cog me-2"></i>
-                        <span class="align-middle">Settings</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <span class="d-flex align-items-center align-middle">
-                          <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
-                          <span class="flex-grow-1 align-middle">Billing</span>
-                          <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
-                        </span>
                       </a>
                     </li>
                     <li>
@@ -348,57 +398,170 @@
               </ul>
             </div>
           </nav>
-
+          
           <!-- / Navbar -->
+          <div class="container">
+            <div class="form-container">
+              <h2>User Form and Image Upload</h2>
+              <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}">
+                {% csrf_token %}
+                <div class="form-row">
+                  <label for="patient-id">Patient id:</label>
+                  <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value|default_if_none:'' }}" readonly>
 
-          <!-- Content wrapper -->
-          <div class="content-wrapper">
-            <!-- Content -->
-
-            <div class="container">
-            
-                <div id="upload-content">
-                    <h1>Your Recent Files</h1>
-                    
-                   
-                    <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                        {% csrf_token %}
-                        <label>Upload the Center Image</label>
-                        <input type="file" name="center_image" required>
-                        <button type="submit" class="upload-btn">Upload</button>
-                        <button type="button" class="delete-btn" data-imageid="{{ center_image.id }}" onclick="deleteImage('{{ center_image.id }}')">Delete</button>
-                    </form>
-                    <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                      {% csrf_token %}
+                  <label for="patient-name">Patient name:</label>
+                  <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value|default_if_none:'' }}">
+                </div>
+                
+                <div class="form-row">
+                  <label for="patient-email">Patient email:</label>
+                  <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value|default_if_none:'' }}">
+                  
+                  <label for="appointed-doctor">Appointed doctor:</label>
+                  <input type="text" id="appointed_doctor" name="appointed_doctor" value="{{ form.appointed_doctor.value|default_if_none:'' }}">
+                </div>
+                
+                <div class="form-row">
+                  <label for="patient-age">Patient age:</label>
+                  <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value|default_if_none:'' }}">
+                  
+                  <label for="patient-gender">Patient gender:</label>
+                  <div class="form-row">
+                    <select id="patient_gender" name="patient_gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                </div>
+                
+                <div class="form-row">
+                  <label for="center">Center:</label>
+                  <div class="form-row">
+                    <select id="center" name="center">
+                        <option value="">Select Center</option>
+                        <option value="Mumbai">Mumbai</option>
+                        <option value="Pune">Pune</option>
+                        <option value="Nagpur">Nagpur</option>
+                    </select>
+                  </div>
+                  <label for="report-date">Report Generation date:</label>
+                  <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}">
+                </div>
+                
+                <div class="form-row">
+                  <label for="scan-date">Scan date:</label>
+                  <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}">
+                </div>
+                
+                <div class="file-box">
+                  <label>Upload the Center Image</label>
+                  <input type="file" name="center_image" required>
+                </div>
+                <div class="file-box">
+                  <label>Upload Left 45 Image</label>
+                  <input type="file" name="left_45_image" required>
+                </div>
+                <div class="file-box">
+                  <label>Upload Left 90 Image</label>
+                  <input type="file" name="left_90_image" required> 
+                </div>
+                <div class="file-box">
+                  <label>Upload Right 45 Image</label>
+                  <input type="file" name="right_45_image" required> 
+                </div>
+                <div class="file-box">
+                  <label>Upload Right 90 Image</label>
+                  <input type="file" name="right_90_image" required> 
+                </div>
+                <div class="form-footer">
+                  <button type="submit" class="upload-btn">Submit</button>
+                </div>
+              </form>
+            </div>
+          </div>
+<!-- 
+      
+          <div class="layout-container">
+              <div class="form-container">
+                <h2>User Form and Image Upload</h2>
+                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <label for="patient_id">Patient ID:</label>
+                        <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value }}" readonly>
+                    </div>
+                    <div class="form-row">
+                        <label for="patient_name">Patient Name:</label>
+                        <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="patient_email">Patient Email:</label>
+                        <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="appointed_doctor">Appointed Doctor:</label>
+                        <input type="text" id="appointed_doctor" name="appointed_doctor" value="{{ form.appointed_doctor.value }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="patient_age">Patient Age:</label>
+                        <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value }}">
+                    </div>
+                    <div class="form-row">
+                        <label for="patient_gender">Patient Gender:</label>
+                        <select id="patient_gender" name="patient_gender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="center">Center:</label>
+                        <select id="center" name="center">
+                            <option value="">Select Center</option>
+                            <option value="Mumbai">Mumbai</option>
+                            <option value="Pune">Pune</option>
+                            <option value="Nagpur">Nagpur</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="report_generation_date">Report Generation Date:</label>
+                        <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}">
+                    </div>
+                    <div class="form-group">
+                      <label for="scan_date">Scan Date:</label>
+                      <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}">
+                    </div>
+                    <div class="file-box">
+                      <label>Upload the Center Image</label>
+                      <input type="file" name="center_image" required>
+                    </div>
+                    <div class="file-box">
                       <label>Upload Left 45 Image</label>
                       <input type="file" name="left_45_image" required>
-                      <button type="submit" class="upload-btn">Upload</button>
-                      <button type="button" class="delete-btn">Delete</button>
-                  </form>
-                    <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                        {% csrf_token %}
-                        <label>Upload Left 90 Image</label>
-                        <input type="file" name="left_45_image" required>
-                        <button type="submit" class="upload-btn">Upload</button>
-                        <button type="button" class="delete-btn">Delete</button>
-                    </form>
-                    <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                        {% csrf_token %}
-                        <label>Upload Right 45 Image</label>
-                        <input type="file" name="left_45_image" required>
-                        <button type="submit" class="upload-btn">Upload</button>
-                        <button type="button" class="delete-btn">Delete</button>
-                    </form>
-                    <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                        {% csrf_token %}
-                        <label>Upload Right 90 Image</label>
-                        <input type="file" name="left_45_image" required>
-                        <button type="submit" class="upload-btn">Upload</button>
-                        <button type="button" class="delete-btn">Delete</button>
-                    </form>
-                </div>
-            </div>
-            
+                    </div>
+                    <div class="file-box">
+                      <label>Upload Left 90 Image</label>
+                      <input type="file" name="left_90_image" required> 
+                    </div>
+                    <div class="file-box">
+                      <label>Upload Right 45 Image</label>
+                      <input type="file" name="right_45_image" required> 
+                    </div>
+                    <div class="file-box">
+                      <label>Upload Right 90 Image</label>
+                      <input type="file" name="right_90_image" required> 
+                    </div>
+                    <div class="form-footer">
+                      <button type="submit" class="upload-btn">Upload All</button>
+                    </div>
+                </form>
+              </div>
+
+            </div> -->
+          
             <!-- / Content -->
 
             <!-- Footer -->
@@ -476,30 +639,6 @@
 
     <!-- Place this tag in your head or just before your close body tag. -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <script>
-        function deleteImage(imageId) {
-            var confirmDelete = confirm("Are you sure you want to delete this image?");
-            if (confirmDelete) {
-                // Make an AJAX request to delete the image
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            // Optionally handle success response
-                            console.log('Image deleted successfully');
-                            location.reload(); // Reload the page after deletion
-                        } else {
-                            // Optionally handle error response
-                            console.error('Error deleting image');
-                        }
-                    }
-                };
-    
-                xhr.open('DELETE', '{% url "delete_image" 0 %}'.replace('0', imageId), true);
-                xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
-                xhr.send();
-            }
-        }
-    </script>
+
   </body>
 </html>

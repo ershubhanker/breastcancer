@@ -4,7 +4,6 @@ from  django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import SetPasswordForm
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import home
 from django.contrib.auth.views import PasswordResetConfirmView
 from rest_framework.routers import DefaultRouter
 from django.urls import path
@@ -28,11 +27,11 @@ urlpatterns = [
     # Generate pdf
     path('generate-pdf/', GeneratePDFView.as_view(), name='generate_pdf'),
     # home pages
-    path('home/', views.home, name='home'),
+    # path('home/', views.home, name='home'),
     # path('operator-home/', views.operator_home, name = "operator-home"),
     # admin home page
     path('home-admin/', views.adminhome, name='admin_home'),
-    path('delete/<int:image_id>/', views.delete_image, name='delete_image'),
+    path('delete-image/<int:image_id>/', views.delete_image, name='delete_image'),
     # password recovery
     # path('reset_password/', auth_views.PasswordResetView.as_view(template_name = 'forget_password.html'), name='reset_password'),
     # path('reset_password_sent/', auth_views.PasswordResetDoneView.as_view(template_name = 'email_sent.html'), name='password_reset_done'),

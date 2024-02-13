@@ -59,7 +59,7 @@
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Dashboard - Analytics | Sneat - Bootstrap 5 HTML Admin Template - Pro</title>
+    <title>Dashboard - Analytics |myTherma</title>
 
     <meta name="description" content="" />
 
@@ -103,7 +103,11 @@
         justify-content: center; /* Center the items */
         gap: 15px; /* Add a gap between rows and columns */
     }
-    
+    .heading{
+      color: rgb(251, 251, 251);
+      font-weight: bolder;
+      padding: 10px;
+    }
     form {
         width: calc(100% - 40px); /* Full width minus padding */
         max-width: 650px; /* Maximum width of the form */
@@ -133,14 +137,13 @@
     }
     
     .form-header {
-        background-color: #0ecae7; /* Blue background for the header */
-        color: white; /* White text color */
-        padding: 10px; /* Padding inside the header */
-        border-top-left-radius: 10px; /* Rounded top-left corner */
-        border-top-right-radius: 10px; /* Rounded top-right corner */
-        font-size: 18px; /* Larger font size for the header */
+      background-color: #0ecae7;
+      color: white;
+      padding: 5px;
+      font-size: 18px;
+      margin: 25px;
+      border-radius: 15px;
     }
-    
     .submit-btn {
         background-color: #ff6347; /* Red background for the submit button */
         color: white; /* White text color */
@@ -190,7 +193,7 @@
 
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
           <div class="app-brand demo">
-            <a href="index.html" class="app-brand-link">
+            <a href="{% url 'index' %}" class="app-brand-link">
               <span class="app-brand-logo demo">
                 <svg
                   width="25"
@@ -246,7 +249,7 @@
                   </g>
                 </svg>
               </span>
-              <span class="app-brand-text demo menu-text fw-bolder ms-2">Sneat</span>
+              <span class="app-brand-text demo menu-text fw-bolder ms-2", style="text-transform: none;">myTherma</span>
             </a>
 
             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -337,34 +340,10 @@
                             </div>
                           </div>
                           <div class="flex-grow-1">
-                            <span class="fw-semibold d-block">John Doe</span>
-                            <small class="text-muted">Admin</small>
+                            <span class="fw-semibold d-block">{{ user.username }}</span>
+                            <small class="text-muted">{{ user.geeks_field }}</small>
                           </div>
                         </div>
-                      </a>
-                    </li>
-                    <li>
-                      <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="bx bx-user me-2"></i>
-                        <span class="align-middle">My Profile</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <i class="bx bx-cog me-2"></i>
-                        <span class="align-middle">Settings</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">
-                        <span class="d-flex align-items-center align-middle">
-                          <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
-                          <span class="flex-grow-1 align-middle">Billing</span>
-                          <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
-                        </span>
                       </a>
                     </li>
                     <li>
@@ -392,9 +371,9 @@
             <section class="section main-section">
               <div class="form-container">
                   <div class="form-header">
-                      <h2>User Form</h2>
+                      <h2 class = "heading">User Form</h2>
                   </div>
-                  <form method="post" enctype="multipart/form-data" onsubmit="showSpinner()">
+                  <form method="post" enctype="multipart/form-data">
                       {% csrf_token %}
                       {{ form.as_p }}
                       <div class="form-footer">
