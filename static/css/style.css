@@ -132,7 +132,7 @@ body {
     margin-left: 0; /* No margin when the sidebar is minimized */
 }
 
-.file-box {
+.file-box { 
     width: 90%; /* Adjust width as needed */
     margin: 0 auto 20px auto; /* Center the box and add space below */
     padding: 10px; /* Add padding inside the box */

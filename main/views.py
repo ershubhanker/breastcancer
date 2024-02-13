@@ -25,7 +25,7 @@ from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from .forms import DoctorRegistrationForm, DoctorLoginForm
 from django.contrib.auth import authenticate, get_user_model
-from .backends import UsernameOrMobileModelBackend
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 import requests
 import json
@@ -46,7 +46,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from datetime import datetime, timedelta
 from reportlab.lib import colors
 from datetime import datetime, date
-from django.db.models import Q
+from django.db.models import Avg
 from django.http import JsonResponse
 from django.core import serializers
 from django.conf import settings
@@ -71,8 +71,9 @@ from PIL import Image as PILImage
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from .models import UserForm
+from .models import Image, Assignment, Doctor
 from .forms import UserFormForm
-from django.http import HttpResponseRedirect
+from django.views.decorators.http import require_http_methods
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from .models import UserForm
@@ -80,6 +81,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import Image as ReportLabImage
 global_token=None
 check_user=None
 def save_token(token_value, user):
@@ -185,7 +187,7 @@ def doctor_login(request):
             design = user.geeks_field
             if design == "Operator":
                 login(request, user)
-                return redirect('home') 
+                return redirect('upload-image') 
             if design == "Doctor":
                 login(request, user)
                 return redirect('index') 
@@ -210,24 +212,24 @@ def doctor_logout(request):
     return redirect('doctor_login') 
 
 # home page
-@login_required
-def home(request):
-    if request.method == 'POST':
-        form = UserFormForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return render(request, 'operator/upload-image.html')  # Customize the success template as needed
-        else:
-            print(form.errors)  # Print form errors for debugging
-    else:
-        # Set default values for date fields
-        default_values = {
-            'report_generation_date': timezone.now().date(),
-            'scan_date': timezone.now().date(),
-        }
-        form = UserFormForm(initial=default_values)
+# @login_required
+# def home(request):
+#     if request.method == 'POST':
+#         form = UserFormForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return render(request, 'operator/upload-image.html')  # Customize the success template as needed
+#         else:
+#             print(form.errors)  # Print form errors for debugging
+#     else:
+#         # Set default values for date fields
+#         default_values = {
+#             'report_generation_date': timezone.now().date(),
+#             'scan_date': timezone.now().date(),
+#         }
+#         form = UserFormForm(initial=default_values)
 
-    return render(request, 'operator/home.html', {'form': form})
+#     return render(request, 'operator/home.html', {'form': form})
 # send credit requset data to admin home
 
 
@@ -280,163 +282,76 @@ def DoctorProfile(request):
     context={'doctor':doctor}
     return render(request, 'doctorpanel/doctor-profile.html', context)
 
-# To generate PDF 
-
-class GeneratePDFView(View):
-    def get(self, request, *args, **kwargs):
-        # Fetch the latest user form data
-        user_form_data = UserForm.objects.last()
-
-        # Get parameters from the request
-        param1 = request.GET.get('param1', 'Default Param 1')
-        param2 = request.GET.get('param2', 'Default Param 2')
-        param3 = request.GET.get('param3', 'Default Param 3')
-        param4 = request.GET.get('param4', 'Default Param 4')
-        param5 = request.GET.get('param5', 'Default Param 5')
-        param6 = request.GET.get('param6', 'Default Param 6')
-        param7 = request.GET.get('param7', 'Default Param 7')
-        param8 = request.GET.get('param8', 'Default Param 8')
-        param9 = request.GET.get('param9', 'Default Param 9')
-        param10 = request.GET.get('param10', 'Default Param 10')
-        param11 = request.GET.get('param11', 'Default Param 11')
-
-        # Create a BytesIO buffer to receive PDF data
-        buffer = BytesIO()
-
-        # Create the PDF object, using BytesIO as its "file"
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-
-        # Define styles for the title and other elements
-        styles = getSampleStyleSheet()
-        title_style = styles['Title']
-        subtitle_style = styles['Heading2']
-        normal_style = styles['Normal']
-
-        # Define elements for the PDF content
-        elements = []
-
-        # Title: Breast Health Report
-        title_text = '<b><font size="16">Breast Health Report</font></b>'
-        elements.append(Paragraph(title_text, title_style))
-
-        # Patient ID to the right of the page
-        patient_id_content = f'<b>Patient ID: {user_form_data.patient_id}</b>'
-        elements.append(Paragraph(patient_id_content, normal_style))
-        elements.append(Spacer(1, 12))  # Add some space between elements
-        elements.append(Paragraph('<hr/>', normal_style))  # Add an HR line
-
-        # Sub-heading: General Details (in blue color)
-        general_details_text = '<font color="blue"><b>General Details</b></font>'
-        elements.append(Paragraph(general_details_text, subtitle_style))
-        # Horizontal line with light blue color
-        elements.append(HRFlowable(width="100%", color=colors.lightblue, thickness=3, spaceAfter=12))
-
-        # User Form Data without using a table
-        user_form_content = [
-            f'Name: {user_form_data.patient_name}',
-            f'Email: {user_form_data.patient_email}',
-            f'Doctor: {user_form_data.appointed_doctor}',
-            f'Center: {user_form_data.center}',
-            f'Age: {user_form_data.patient_age}',
-            f'Report Generation Date: {user_form_data.report_generation_date}',
-            f'Gender: {user_form_data.patient_gender}',
-            f'Scan Date: {user_form_data.scan_date}',
-        ]
-        for line in user_form_content:
-            elements.append(Paragraph(line, normal_style))
-            elements.append(Spacer(1, 6))  # Add some vertical space between lines
-        # Horizontal line with light blue color
-        elements.append(HRFlowable(width="100%", color=colors.lightblue, thickness=3, spaceAfter=12))
-        # Thermalytics Score
-        # Sub-heading: General Details (in blue color)
-        thermalytics_details_text = '<font color="blue"><b>Thermalytics Score</b></font>'
-        elements.append(Paragraph(thermalytics_details_text, subtitle_style))
-         # User Form Data without using a table
-        user_form_content = [
-            'Maximum Body Temperature:'f'{param6}°C',
-            'Minimum Body Temperature: 'f'{param7}°C',
-            'Mean ROI Temperature: 'f'{param8}°C',
-            'Percentage of ROI: 'f'{param9}%',
-            'Aerolar Temperature Differences: 'f'{param10}°C',
-            'Aerolar Symmetry:' f'{param11}%',
-        ]
-        for line in user_form_content:
-            elements.append(Paragraph(line, normal_style))
-            elements.append(Spacer(1, 6))  # Add some vertical space between lines
-
-        thermalytics_details_text = '<font color="blue"><b>Thermal Analysis</b></font>'
-        elements.append(Paragraph(thermalytics_details_text, subtitle_style))
-        elements.append(HRFlowable(width="100%", color=colors.lightblue, thickness=3, spaceAfter=12))
-        # Parameters from thermal_parameters.html
-
-        parameters_content = [
-            ['Thermal Parameters', 'Thermal Analysis'],
-            ['Number of Hotspots', param1],
-            ['Temperature around blue', f'{param2}%'],
-            ['Hotspot Shape', param3],
-            ['Threshold', param4],
-            ['Extent of Hotspots', f'{param5}%'],
-        ]
-        parameters_table = Table(parameters_content, colWidths=[300, 120])
-        parameters_table.setStyle(TableStyle([
-            ('GRID', (0, 0), (-1, -1), 1, colors.lightblue),  # Light blue border for the table
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),  # Black text color for the header
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Center-align text in the table
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # Center-align text vertically
-            ('INNERGRID', (0, 0), (-1, -1), 1, colors.lightblue),  # Light blue inner grid lines
-            ('BACKGROUND', (0, 0), (-1, 0), colors.white),  # White background for the header
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # White background for the content
-        ]))
-        elements.append(parameters_table)
-
-        # Build the PDF document
-        doc.build(elements)
-
-        # FileResponse sets the Content-Disposition header so that browsers
-        # present the option to save the file.
-        buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="generated_pdf.pdf"'
-        return response
-# imran code
-
-from .models import Image, Assignment, Doctor
 
 @login_required
 def upload_image(request):
+    # if request.method == 'POST':
+    #     image_field_name = next(iter(request.FILES))
+    #     image_file = request.FILES.get(image_field_name)
+
+    #     if image_file:
+    #         # Create the image instance without saving to DB
+    #         new_image = Image(title=image_field_name.replace('_', ' ').capitalize(), 
+    #                           image=image_file, 
+    #                            status='default_status',
+    #                           uploader=request.user)
+
+    #         # Logic to assign the image to a doctor
+    #         # This is a placeholder, replace with your actual logic
+    #         assignment = Assignment.objects.filter(operator=request.user).first()
+    #         if assignment:
+    #             new_image.assigned_doctor = assignment.doctor
+    #             print(new_image.assigned_doctor)
+    #             # Save the image instance to DB
+    #         new_image.save()
+    #         messages.success(request, "Image uploaded successfully.") 
+    #         return redirect('upload-image')
+
+    # return render(request, 'operator/upload-image.html')
     if request.method == 'POST':
-        image_field_name = next(iter(request.FILES))
-        image_file = request.FILES.get(image_field_name)
-
-        if image_file:
-            # Create the image instance without saving to DB
-            new_image = Image(title=image_field_name.replace('_', ' ').capitalize(), 
-                              image=image_file, 
-                              uploader=request.user)
-
-            # Logic to assign the image to a doctor
-            # This is a placeholder, replace with your actual logic
-            assignment = Assignment.objects.filter(operator=request.user).first()
-            if assignment:
-                new_image.assigned_doctor = assignment.doctor
-                print(new_image.assigned_doctor)
-                # Save the image instance to DB
-            new_image.save()
-            messages.success(request, "Image uploaded successfully.") 
+        form = UserFormForm(request.POST)
+        if form.is_valid():
+            user_form = form.save()  # Save the patient information
+            
+            # Handle image uploads
+            images = {
+                'center_image': request.FILES.get('center_image'),
+                'left_45_image': request.FILES.get('left_45_image'),
+                'left_90_image': request.FILES.get('left_90_image'),
+                'right_45_image': request.FILES.get('right_45_image'),
+                'right_90_image': request.FILES.get('right_90_image'),
+            }
+            for image_field_name, image_file in images.items():
+                if image_file:
+                    new_image = Image(
+                        title=image_field_name.replace('_', ' ').capitalize(), 
+                        image=image_file, 
+                        status='default_status',
+                        uploader=request.user
+                    )
+                    # Logic to assign the image to a doctor
+                    assignment = Assignment.objects.filter(operator=request.user).first()
+                    if assignment:
+                        new_image.assigned_doctor = assignment.doctor
+                    new_image.save()
+            
+            messages.success(request, "Patient information and images uploaded successfully.")
             return redirect('upload-image')
+        else:
+            print(form.errors)  # Print form errors for debugging
 
-    return render(request, 'operator/upload-image.html')
+    else: 
+        form = UserFormForm(initial={
+            'report_generation_date': timezone.now().date(),
+            'scan_date': timezone.now().date(),
+        })
+
+    return render(request, 'operator/upload-image.html', {'form': form})
 def delete_image(request, image_id):
-    image = get_object_or_404(Image, pk=image_id)
-
-    # Delete the file from the server
-    if os.path.exists(image.image.path):
-        os.remove(image.image.path)
-
-    # Delete the record from the database
-    image.delete()
-
-    return JsonResponse({'message': 'Image deleted successfully'})
+    if request.method == 'POST':
+        image = get_object_or_404(Image, pk=image_id)
+        image.delete()
+        return redirect('operator/upload-image.html')
 # def home(request):
 #     return render(request, 'home.html')  # Make sure this template path is correct.
 @login_required
@@ -604,16 +519,16 @@ def calculate_thermal_image(image_path, calibration_image_path,threshold_tempera
         return temperature
     def aerolar_difference(image_path, calibration_image_path):
     # Function to convert an RGB color to the closest temperature based on calibration data
-        def rgb_to_temperature(pixel_color, color_temp_mapping):
-            pixel_color_np = np.array(pixel_color, dtype=np.int16)
-            min_distance = float('inf')
-            closest_temp = None
-            for color, temp in color_temp_mapping:
-                distance = np.linalg.norm(pixel_color_np - np.array(color, dtype=np.int16))
-                if distance < min_distance:
-                    min_distance = distance
-                    closest_temp = temp
-            return closest_temp
+        # def rgb_to_temperature(pixel_color, color_temp_mapping):
+        #     pixel_color_np = np.array(pixel_color, dtype=np.int16)
+        #     min_distance = float('inf')
+        #     closest_temp = None
+        #     for color, temp in color_temp_mapping:
+        #         distance = np.linalg.norm(pixel_color_np - np.array(color, dtype=np.int16))
+        #         if distance < min_distance:
+        #             min_distance = distance
+        #             closest_temp = temp
+        #     return closest_temp
 
         # Function to map color to temperature using calibration data
         def map_color_to_temp_using_calibration(color, color_temp_mapping):
@@ -680,15 +595,17 @@ def calculate_thermal_image(image_path, calibration_image_path,threshold_tempera
             # Map the color to the temperature
             temperature = map_color_to_temp_using_calibration(mean_color_rgb, color_temp_mapping)
             cross['temperature'] = temperature
-        if len(crosses_info) < 2:
-            return None, None  # You can return default values or raise an exception if needed
-        # Display the results
+        if len(crosses_info) >= 2:
+            # Calculate the temperature difference between the two crosses
+            diff = abs(crosses_info[0]['temperature'] - crosses_info[1]['temperature'])
+            # Clamp the difference if it exceeds 5 degrees
+            diff = min(diff, 4)
+            avg = (crosses_info[0]['temperature'] + crosses_info[1]['temperature']) / 2
+            ans = round(diff / avg, 2) * 100 if avg != 0 else 0
+            return diff, ans
         else:
-            for cross in crosses_info:
-                diff = crosses_info[0]['temperature']-crosses_info[1]['temperature']
-                avg = (crosses_info[0]['temperature']+crosses_info[1]['temperature'])/2
-                ans = round(diff/avg,2) * 100
-                return diff,ans
+            # Return None or raise an exception if there are not enough crosses detected
+            return 0.0, 0.0
 
     def calculate_roi_statistics(mask, image, calibration_column):
         roi_pixels = image[mask > 0]
@@ -857,6 +774,225 @@ def thermal_parameters(request):
     context = {'thermal_data': thermal_data}
     return render(request, 'doctor/thermal_parameters.html', context)
 
+# To generate PDF 
+def calculate_average_parameters(threshold_value):
+    images = Image.objects.all()
+    total_params = {
+        "NumberofHotspots": 0,
+        "TemperatureDifferenceAroundBoundaries": 0,
+        "HotspotShapes": 0,
+        "ExtentofHotspots": 0,
+        "MaxHotspotTemperature": 0,
+        "MinHotspotTemperature": 0,
+        "MeanROITemperature": 0,
+        "PercentageofROI": 0,
+        "temperaturedifference":0,
+        "AerolarSymmetry" : 0,
+        
+    }
+    count = 0
+
+    calibration_image_path = os.path.join(settings.MEDIA_ROOT, 'media/new_directory/', 'callibaration_image.png')
+    if not os.path.exists(calibration_image_path):
+        raise FileNotFoundError(f"Calibration image not found at {calibration_image_path}")
+
+    for image in images:
+        try:
+            image_file_path = os.path.join(settings.MEDIA_ROOT, image.image.name)
+            if not os.path.isfile(image_file_path):
+                print(f"Image file not found at {image_file_path}")
+                continue
+
+            parameters = calculate_thermal_image(image_file_path, calibration_image_path, threshold_value)
+            if parameters is not None:
+                for key, value in parameters.items():
+                    if isinstance(value, (int, float)):
+                        total_params[key] += value
+                count += 1
+        except Exception as e:
+            print(f"Error processing image {image.id}: {e}")
+
+    if count > 0:
+        # Round the averages to 2 decimal places
+        averages = {key: round(total / count, 2) for key, total in total_params.items()}
+    else:
+        averages = {key: 0 for key in total_params.keys()}  # or handle no images case
+
+    return averages
+
+def calculate_highest_parameters(threshold_value):
+    images = Image.objects.all()
+    highest_params = {
+        "NumberofHotspots": 0,
+        "TemperatureDifferenceAroundBoundaries": 0,
+        "ExtentofHotspots": 0,
+        "HotspotShapes": 0,
+    }
+    calibration_image_path = os.path.join(settings.MEDIA_ROOT, 'media/new_directory/', 'callibaration_image.png')
+    if not os.path.exists(calibration_image_path):
+        raise FileNotFoundError(f"Calibration image not found at {calibration_image_path}")
+    for image in images:
+        try:
+            image_file_path = os.path.join(settings.MEDIA_ROOT, image.image.name)
+            parameters = calculate_thermal_image(image_file_path, calibration_image_path, threshold_value)
+            if parameters is not None:
+                for key in highest_params:
+                    if key in parameters and isinstance(parameters[key], (int, float)):
+                        highest_params[key] = max(highest_params[key], parameters[key])
+        except Exception as e:
+            print(f"Error processing image {image.id}: {e}")
+
+    return highest_params
+
+def get_image_paths(self, directory):
+    # List all image files in the given directory
+    return [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith('.png')]
+class GeneratePDFView(View):
+    def get_image_paths(self, directory):
+        # List all image files in the given directory
+        image_paths = []
+        for f in os.listdir(directory):
+            if f.lower().endswith('.png'):
+                image_paths.append(os.path.join(directory, f))
+        return image_paths
+    def get(self, request, *args, **kwargs):
+        # Fetch the latest user form data
+
+        
+        user_form_data = UserForm.objects.last()
+
+        # Get threshold value from the session
+        threshold_value = request.session.get('threshold_value', 34)
+
+        # Calculate average parameters
+        average_params = calculate_average_parameters(threshold_value)
+        highest_params = calculate_highest_parameters(threshold_value)
+        # Create a BytesIO buffer to receive PDF data
+        buffer = BytesIO()
+
+        # Create the PDF object, using BytesIO as its "file"
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+        # Define styles for the title and other elements
+        styles = getSampleStyleSheet()
+        normal_style = styles['Normal']
+        heading_style = styles['Heading2']
+
+        # Initialize elements for the PDF content
+        elements = []
+
+        # Title: Breast Health Report
+        title_text = '<b><font size="16">Breast Health Report</font></b>'
+        elements.append(Paragraph(title_text, styles['Title']))
+        elements.append(Spacer(1, 12))
+
+        # Patient ID to the right of the page
+        patient_id_content = f'<b>Patient ID: {user_form_data.patient_id}</b>'
+        elements.append(Paragraph(patient_id_content, normal_style))
+        elements.append(Spacer(1, 12))
+        elements.append(Paragraph('<hr/>', normal_style))
+
+        # Sub-heading: General Details
+        general_details_text = '<font color="blue"><b>General Details</b></font>'
+        elements.append(Paragraph(general_details_text, heading_style))
+        elements.append(Spacer(1, 6))
+
+        # User Form Data
+        user_form_content = [
+            f'Name: {user_form_data.patient_name}',
+            f'Email: {user_form_data.patient_email}',
+            f'Doctor: {user_form_data.appointed_doctor}',
+            f'Center: {user_form_data.center}',
+            f'Age: {user_form_data.patient_age}',
+            f'Report Generation Date: {user_form_data.report_generation_date.strftime("%Y-%m-%d")}',
+            f'Gender: {user_form_data.patient_gender}',
+            f'Scan Date: {user_form_data.scan_date.strftime("%Y-%m-%d")}',
+        ]
+        for line in user_form_content:
+            elements.append(Paragraph(line, normal_style))
+            elements.append(Spacer(1, 6))
+
+        # Thermalytics Score
+        elements.append(Paragraph('<font color="blue"><b>Thermalytics Score</b></font>', heading_style))
+        elements.append(Spacer(1, 6))
+        thermalytics_content = [
+            f'Maximum Body Temperature: {average_params.get("MaxHotspotTemperature", "N/A")}°C',
+            f'Minimum Body Temperature: {average_params.get("MinHotspotTemperature", "N/A")}°C',
+            f'Mean ROI Temperature: {average_params.get("MeanROITemperature", "N/A")}°C',
+            f'Percentage of ROI: {average_params.get("PercentageofROI", "N/A")}%',
+            f'Aerolar Temperature Differences: {average_params.get("temperaturedifference", "N/A")}°C',
+            f'Aerolar Symmetry: {average_params.get("AerolarSymmetry", "N/A")}%'
+        ]
+        for line in thermalytics_content:
+            elements.append(Paragraph(line, normal_style))
+            elements.append(Spacer(1, 6))
+        # Thermal Analysis
+        elements.append(Paragraph('<font color="blue"><b>Thermal Analysis</b></font>', styles['Heading2']))
+        analysis_content = [
+            ['Thermal Parameters', 'Highest Value'],
+            ['Number of Hotspots', highest_params.get('NumberofHotspots', 'N/A')],
+            ['Temperature Difference Around Boundaries', f"{highest_params.get('TemperatureDifferenceAroundBoundaries', 'N/A')}%"],
+            ['Extent of Hotspots', f"{highest_params.get('ExtentofHotspots', 'N/A')}%"],
+            ['Hotspot Shape', highest_params.get('HotspotShapes', 'N/A')],
+            ['Threshold',threshold_value],
+        ]
+        thermal_analysis_table = Table(analysis_content, colWidths=[None, 120])
+        thermal_analysis_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+        elements.append(thermal_analysis_table)
+        # Thermal Images
+        # Get the processed image paths
+        processed_image_directory = os.path.join(settings.MEDIA_ROOT, 'uploads/processed_thermal_image')
+        image_paths = self.get_image_paths(processed_image_directory)
+        
+        # Assuming all images are the same size, set the width and height
+        image_width = 2.5 * inch
+        image_height = 2 * inch
+        spacer_height = 0.1 * inch
+
+        # Create rows of images with 2 images per row
+        image_rows = []
+        for i in range(0, len(image_paths), 2):
+            row = []
+            for j in range(2):
+                if i + j < len(image_paths):
+                    img = ReportLabImage(image_paths[i + j], image_width, image_height)
+                    row.append(img)
+                else:
+                    # If there is no image for the second column of the last row, add a blank string.
+                    row.append('')
+            image_rows.append(row)
+
+        # Create a table with the image rows
+        image_table = Table(image_rows)
+
+        # Define the style for the table, if needed
+        image_table_style = TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            # Add more styles if needed
+        ])
+
+        # Apply the style to the table
+        image_table.setStyle(image_table_style)
+
+        # Add the table to the elements list
+        elements.append(image_table)
+        
+        # Build the PDF document
+        doc.build(elements)
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="breast_health_report.pdf"'
+        return response
+# imran code
 class GetJwtToken(APIView):
     global check_token
     permission_classes = ()
