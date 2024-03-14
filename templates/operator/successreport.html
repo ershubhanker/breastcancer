@@ -1,81 +1,4 @@
-<!-- {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-    <div class="container">
-        <button class="hamburger-menu">
-            &#9776; 
-        </button>
-        <div id="sidebar" class="active">
-            <div class="sidebar-header">Breast Cancer</div>
-            <ul class="sidebar-menu">
-        </div>
-        
-        <div class="container">
-            
-            <div id="upload-content">
-                <h1>Your Recent Files</h1>
-                
-               
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                    {% csrf_token %}
-                    <label>Upload the Center Image</label>
-                    <input type="file" name="center_image" required>
-                    <button type="submit" class="upload-btn">Upload</button>
-                    <button type="button" class="delete-btn">Delete</button>
-                </form>
-                
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                    {% csrf_token %}
-                    <label>Upload Left 45 Image</label>
-                    <input type="file" name="left_45_image" required>
-                    <button type="submit" class="upload-btn">Upload</button>
-                    <button type="button" class="delete-btn">Delete</button>
-                </form>
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                    {% csrf_token %}
-                    <label>Upload Left 90 Image</label>
-                    <input type="file" name="left_45_image" required>
-                    <button type="submit" class="upload-btn">Upload</button>
-                    <button type="button" class="delete-btn">Delete</button>
-                </form>
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                    {% csrf_token %}
-                    <label>Upload Right 45 Image</label>
-                    <input type="file" name="left_45_image" required>
-                    <button type="submit" class="upload-btn">Upload</button>
-                    <button type="button" class="delete-btn">Delete</button>
-                </form>
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}" class="file-box">
-                    {% csrf_token %}
-                    <label>Upload Right 90 Image</label>
-                    <input type="file" name="left_45_image" required>
-                    <button type="submit" class="upload-btn">Upload</button>
-                    <button type="button" class="delete-btn">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <script src="{% static 'myapp/js/script.js' %}"></script>
-    <script>
-        // This script runs after the page loads
-        window.onload = function() {
-            {% if messages %}
-                {% for message in messages %}
-                    alert('{{ message }}');  // Display an alert with the message
-                {% endfor %}
-            {% endif %}
-        }
-    </script>
-</body>
-</html> -->
 
 {% load static %}
 <!DOCTYPE html>
@@ -145,84 +68,32 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{% static '/assets/js/config.js' %}"></script>
     <style>
-      /* Improve form container */
-      .form-container {
-        max-width: 750px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-    
-      /* Form title styling */
-      h2 {
-        text-align: center;
-        margin-bottom: 2rem;
-        font-size: 2rem;
-        color: #333;
-      }
-    
-      /* Form row and form group styling */
-      .form-row {
-        display: flex;
-        margin-bottom: 1rem;
-        gap: 1rem;
-      }
-      
-      /* Input and select styling */
-      input[type="text"],
-      input[type="email"],
-      input[type="date"],
-      input[type="number"],
-      select {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        margin-bottom: 0.5rem;
-      }
-    
-
-    
-      /* File input box styling */
-      .file-box {
-        border: 1px dashed #ccc;
-        padding: 1rem;
-        text-align: center;
-        border-radius: 4px;
-        background-color: #f8f9fa;
-      }
-    
-      .file-box input[type="file"] {
-        margin-top: 0.5rem;
-      }
-    
-      /* Submit button styling */
-      .upload-btn {
-        display: block;
-        width: 100%;
-        padding: 1rem;
-        margin-top: 1rem;
-        border: none;
-        border-radius: 4px;
-        background-color: #007bff;
-        color: white;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-    
-      .upload-btn:hover {
-        background-color: #0056b3;
-      }
-    
-      /* Responsive adjustments */
-      @media (max-width: 768px) {
-        .form-row {
-          flex-direction: column;
+        body {
+            font-family: Arial, sans-serif;
         }
-      }
+        .table-container {
+            margin: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
   </head>
 
@@ -409,169 +280,29 @@
           
           <!-- / Navbar -->
           <div class="container">
-            <div class="form-container">
-              <h2>User Form and Image Upload</h2>
-              <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}">
-                {% csrf_token %}
-                <div class="form-row">
-                  <label for="patient-id">Patient id:</label>
-                  <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value|default_if_none:'' }}" readonly>
-
-                  <label for="patient-name">Patient name:</label>
-                  <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value|default_if_none:'' }}">
-                </div>
-                
-                <div class="form-row">
-                  <label for="patient-email">Patient email:</label>
-                  <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value|default_if_none:'' }}">
-                  
-                  <label for="appointed-doctor">Appointed doctor:</label>
-                  <input type="text" id="appointed_doctor" name="appointed_doctor" value="{{ assigned_doctor_name }}" readonly>
-                </div>
-                
-                <div class="form-row">
-                  <label for="patient-age">Patient age:</label>
-                  <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value|default_if_none:'' }}">
-                  
-                  <label for="patient-gender">Patient gender:</label>
-                  <div class="form-row">
-                    <select id="patient_gender" name="patient_gender">
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                </div>
-                
-                <div class="form-row">
-                  <label for="center">Center:</label>
-                  <div class="form-row">
-                    <select id="center" name="center">
-                        <option value="">Select Center</option>
-                        <option value="Mumbai">Mumbai</option>
-                        <option value="Pune">Pune</option>
-                        <option value="Nagpur">Nagpur</option>
-                    </select>
-                  </div>
-                  <label for="report-date">Report Generation date:</label>
-                  <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}">
-                </div>
-                
-                <div class="form-row">
-                  <label for="scan-date">Scan date:</label>
-                  <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}">
-                </div>
-                
-                <div class="file-box">
-                  <label>Upload the Center Image</label>
-                  <input type="file" name="center_image" required>
-                </div>
-                <div class="file-box">
-                  <label>Upload Left 45 Image</label>
-                  <input type="file" name="left_45_image" required>
-                </div>
-                <div class="file-box">
-                  <label>Upload Left 90 Image</label>
-                  <input type="file" name="left_90_image" required> 
-                </div>
-                <div class="file-box">
-                  <label>Upload Right 45 Image</label>
-                  <input type="file" name="right_45_image" required> 
-                </div>
-                <div class="file-box">
-                  <label>Upload Right 90 Image</label>
-                  <input type="file" name="right_90_image" required> 
-                </div>
-                <div class="form-footer">
-                  <button type="submit" class="upload-btn">Submit</button>
-                </div>
-              </form>
-            </div>
+              <h2>Success Report</h2>
+              <table>
+                  <thead>
+                      <tr>
+                          <th>Patient ID</th>
+                          <th>Patient Name</th>
+                          <th>Scan Date</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for submission in submissions %}
+                      <tr>
+                          <td>{{ submission.patient_id }}</td>
+                          <td>{{ submission.patient_name }}</td>
+                          <td>{{ submission.scan_date }}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
           </div>
-<!-- 
-      
-          <div class="layout-container">
-              <div class="form-container">
-                <h2>User Form and Image Upload</h2>
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}">
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <label for="patient_id">Patient ID:</label>
-                        <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value }}" readonly>
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_name">Patient Name:</label>
-                        <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_email">Patient Email:</label>
-                        <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="appointed_doctor">Appointed Doctor:</label>
-                        <input type="text" id="appointed_doctor" name="appointed_doctor" value="{{ form.appointed_doctor.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_age">Patient Age:</label>
-                        <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_gender">Patient Gender:</label>
-                        <select id="patient_gender" name="patient_gender">
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label for="center">Center:</label>
-                        <select id="center" name="center">
-                            <option value="">Select Center</option>
-                            <option value="Mumbai">Mumbai</option>
-                            <option value="Pune">Pune</option>
-                            <option value="Nagpur">Nagpur</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label for="report_generation_date">Report Generation Date:</label>
-                        <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}">
-                    </div>
-                    <div class="form-group">
-                      <label for="scan_date">Scan Date:</label>
-                      <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}">
-                    </div>
-                    <div class="file-box">
-                      <label>Upload the Center Image</label>
-                      <input type="file" name="center_image" required>
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Left 45 Image</label>
-                      <input type="file" name="left_45_image" required>
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Left 90 Image</label>
-                      <input type="file" name="left_90_image" required> 
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Right 45 Image</label>
-                      <input type="file" name="right_45_image" required> 
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Right 90 Image</label>
-                      <input type="file" name="right_90_image" required> 
-                    </div>
-                    <div class="form-footer">
-                      <button type="submit" class="upload-btn">Upload All</button>
-                    </div>
-                </form>
-              </div>
-
-            </div> -->
-          
             <!-- / Content -->
-
+            <br>
+            <br>
             <!-- Footer -->
             <footer class="content-footer footer bg-footer-theme">
               <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">

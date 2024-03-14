@@ -10,6 +10,7 @@ from django.contrib.auth import login
 from django.urls import reverse
 from main.forms import DoctorRegistrationForm
 from django.contrib.sites.models import Site
+from django.http import FileResponse
 from reportlab.lib.pagesizes import letter
 import base64
 from django.core.files.base import ContentFile
@@ -35,7 +36,7 @@ import string
 from reportlab.platypus import KeepTogether
 import pandas as pd
 from django.template.loader import get_template
-from .models import Patient, Doctor, CreditRequest, EmailToken, Image
+from .models import Patient, Doctor, CreditRequest, EmailToken, Image,PdfReport
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from reportlab.lib.units import inch
@@ -43,9 +44,9 @@ from reportlab.lib.colors import white, HexColor, black, green
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from datetime import datetime, timedelta
+import datetime
+from datetime import date
 from reportlab.lib import colors
-from datetime import datetime, date
 from django.db.models import Avg
 from django.http import JsonResponse
 from django.core import serializers
@@ -82,6 +83,9 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Image as ReportLabImage
+from django.db.models import Count
+from django.db.models.functions import TruncDay
+from django.core.serializers.json import DjangoJSONEncoder
 global_token=None
 check_user=None
 def save_token(token_value, user):
@@ -187,7 +191,7 @@ def doctor_login(request):
             design = user.geeks_field
             if design == "Operator":
                 login(request, user)
-                return redirect('upload-image') 
+                return redirect('home') 
             if design == "Doctor":
                 login(request, user)
                 return redirect('index') 
@@ -212,8 +216,6 @@ def doctor_logout(request):
     return redirect('doctor_login') 
 
 # home page
-# @login_required
-# def home(request):
 #     if request.method == 'POST':
 #         form = UserFormForm(request.POST)
 #         if form.is_valid():
@@ -228,10 +230,17 @@ def doctor_logout(request):
 #             'scan_date': timezone.now().date(),
 #         }
 #         form = UserFormForm(initial=default_values)
+@login_required
+def home(request):
+    return render(request, 'operator/home.html')
 
-#     return render(request, 'operator/home.html', {'form': form})
+@login_required
+def autothermix_upload(request):
+    return render(request, 'autothermix/upload.html')
 # send credit requset data to admin home
-
+@login_required
+def doctor_home(request):
+    return render(request, 'doctor/home.html')
 
 def credit_requset_list(request):
     # if request.method == 'GET':
@@ -273,9 +282,27 @@ def adminhome(request):
 # dashboard (doctor)
 @login_required
 def index(request):
-    
-    return render(request, 'doctor/index.html')
+    # Adjust the date range if needed
+    today = timezone.now().date()
+    start_date = today - datetime.timedelta(days=7)
+    end_date = today
 
+    daily_counts = (
+        PdfReport.objects
+        .filter(created_at__date__range=(start_date, end_date))
+        .annotate(date=TruncDay('created_at'))
+        .values('date')
+        .annotate(count=Count('id'))
+        .order_by('date')
+    )
+
+    daily_counts = list(daily_counts)
+    context = {
+        'daily_counts': json.dumps(daily_counts, cls=DjangoJSONEncoder),
+        'pdf_reports': PdfReport.objects.all().order_by('-created_at')
+    }
+
+    return render(request, 'doctor/index.html', context)
 def DoctorProfile(request):
     doctor = Doctor.objects.get(id=request.user.id)
     print(doctor, 'Profile')
@@ -283,6 +310,35 @@ def DoctorProfile(request):
     return render(request, 'doctorpanel/doctor-profile.html', context)
 
 
+
+@login_required
+def dashboard(request):
+    daily_counts = (
+        UserForm.objects
+        .annotate(date=TruncDay('report_generation_date'))
+        .values('date')
+        .annotate(count=Count('patient_id'))
+        .order_by('date')
+    )
+
+    # Convert queryset to list to avoid lazy evaluation issues
+    daily_counts = list(daily_counts)
+
+    # Debug: print the daily counts to the console
+    print(daily_counts)
+
+    labels = [count['date'].strftime('%Y-%m-%d') for count in daily_counts if count['date']]
+    data = [count['count'] for count in daily_counts]
+
+    labels_json = json.dumps(labels, cls=DjangoJSONEncoder)
+    data_json = json.dumps(data, cls=DjangoJSONEncoder)
+
+    context = {
+        'labels_json': labels_json,
+        'data_json': data_json,
+        'daily_counts': daily_counts,
+    }
+    return render(request, 'operator/dashboard.html', context)
 @login_required
 def upload_image(request):
     # if request.method == 'POST':
@@ -308,10 +364,21 @@ def upload_image(request):
     #         return redirect('upload-image')
 
     # return render(request, 'operator/upload-image.html')
+    assigned_doctor_name = "No doctor assigned"
+
     if request.method == 'POST':
+        print(request.FILES)
         form = UserFormForm(request.POST)
         if form.is_valid():
-            user_form = form.save()  # Save the patient information
+            # Before saving any images, check if there's an assigned doctor for the uploader
+            existing_assignment = Assignment.objects.filter(operator=request.user).first()
+            if existing_assignment:
+                assigned_doctor_name = existing_assignment.doctor.username
+            
+            # Now save the UserForm instance with the appointed doctor's name
+            user_form = form.save(commit=False)
+            user_form.appointed_doctor = assigned_doctor_name
+            user_form.save()
             
             # Handle image uploads
             images = {
@@ -321,6 +388,7 @@ def upload_image(request):
                 'right_45_image': request.FILES.get('right_45_image'),
                 'right_90_image': request.FILES.get('right_90_image'),
             }
+
             for image_field_name, image_file in images.items():
                 if image_file:
                     new_image = Image(
@@ -329,24 +397,34 @@ def upload_image(request):
                         status='default_status',
                         uploader=request.user
                     )
-                    # Logic to assign the image to a doctor
-                    assignment = Assignment.objects.filter(operator=request.user).first()
-                    if assignment:
-                        new_image.assigned_doctor = assignment.doctor
+                    # If there's an existing assignment, use that doctor for the newly uploaded images
+                    if existing_assignment:
+                        new_image.assigned_doctor = existing_assignment.doctor
                     new_image.save()
-            
+                    print(new_image)
+
             messages.success(request, "Patient information and images uploaded successfully.")
-            return redirect('upload-image')
+            return redirect('success_report')
         else:
-            print(form.errors)  # Print form errors for debugging
+            print(form.errors)
 
     else: 
         form = UserFormForm(initial={
             'report_generation_date': timezone.now().date(),
             'scan_date': timezone.now().date(),
         })
+        # Also here, set the appointed doctor based on the existing assignments when the page is loaded
+        existing_assignment = Assignment.objects.filter(operator=request.user).first()
+        if existing_assignment:
+            assigned_doctor_name = existing_assignment.doctor.username
 
-    return render(request, 'operator/upload-image.html', {'form': form})
+    context = {'form': form, 'assigned_doctor_name': assigned_doctor_name}
+    return render(request, 'operator/upload-image.html', context)
+
+
+def success_report_view(request):
+    submissions = UserForm.objects.all().order_by('-scan_date')
+    return render(request, 'operator/successreport.html', {'submissions': submissions})
 def delete_image(request, image_id):
     if request.method == 'POST':
         image = get_object_or_404(Image, pk=image_id)
@@ -386,7 +464,12 @@ def save_annotated_image(request):
 
                 # Save the image in the new directory
                 image_file = ContentFile(base64.b64decode(imgstr), name=os.path.join(new_dir, 'annotated_image.' + ext))
-                annotated_image = Image.objects.create(title='Annotated Image', image=image_file,is_annotated=True)
+                annotated_image = Image.objects.create(
+                        title='Annotated Image',
+                        image=image_file,
+                        is_annotated=True,
+                        assigned_doctor=request.user  # Assign the annotated image to the current user
+                    )
                 return JsonResponse({'status': 'success', 'path': annotated_image.image.url})
         else:
                 return JsonResponse({'status': 'error', 'message': 'No image data received'}, status=400)
@@ -709,7 +792,7 @@ def calculate_thermal_image(image_path, calibration_image_path,threshold_tempera
         "NumberofHotspots": len(hotspot_contours),
         "TemperatureDifferenceAroundBoundaries": temperature_difference,
         "HotspotShapes": shape_description,
-        "ExtentofHotspots": hotspot_extent,
+        "ExtentofHotspots": hotspot_area,
         "MaxHotspotTemperature": max_temp,
         "MinHotspotTemperature": min_temp,
         "MeanROITemperature": mean_temp,
@@ -819,6 +902,7 @@ def calculate_average_parameters(threshold_value):
         averages = {key: 0 for key in total_params.keys()}  # or handle no images case
 
     return averages
+
 
 def calculate_highest_parameters(threshold_value):
     images = Image.objects.all()
@@ -988,10 +1072,61 @@ class GeneratePDFView(View):
         
         # Build the PDF document
         doc.build(elements)
+
+        pdf_file_name = 'your_generated_report.pdf'
+        pdf_file_path = os.path.join(settings.MEDIA_ROOT, pdf_file_name)
+        with open(pdf_file_path, 'wb') as f:
+            f.write(buffer.getvalue())
+        
+        # Save the PDF file path in the PdfReport model
+        pdf_report = PdfReport(report_file=pdf_file_name)
+        pdf_report.save()
+
+        # Prepare the response
         buffer.seek(0)
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="breast_health_report.pdf"'
-        return response
+        return FileResponse(buffer, as_attachment=True, filename=pdf_file_name)
+
+
+from rest_framework.generics import CreateAPIView
+from .models import UserForm
+from .serializer import UserFormSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework import status
+from django.urls import reverse
+
+class UserFormCreateView(CreateAPIView):
+    queryset = UserForm.objects.all()
+    serializer_class = UserFormSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            user_form_id = serializer.instance.patient_id
+
+            # Now redirect to the image upload API endpoint
+            # Note: Ensure 'image-upload-api' is the correct name for the image upload URL
+            image_upload_url = reverse('image-upload-api', kwargs={'user_form_id': user_form_id})
+            return Response(
+                {
+                    'message': 'UserForm created successfully, proceed to image upload.',
+                    'user_form_id': user_form_id,
+                    'image_upload_url': request.build_absolute_uri(image_upload_url)
+                },
+                status=status.HTTP_201_CREATED,
+                headers=headers
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ImageUploadAPIView(CreateAPIView):
+    serializer_class = ImageSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+            
 # imran code
 class GetJwtToken(APIView):
     global check_token

@@ -303,19 +303,10 @@
           <ul class="menu-inner py-1">
             <!-- Dashboard -->
             <li class="menu-item active">
-              <a href="{% url 'dashboard' %}" class="menu-link mt-1" >
+              <a href="{% url 'upload' %}" class="menu-link mt-1" >
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Dashboard</div>
               </a>
-              <a href="{% url 'upload-image' %}" class="menu-link mt-1" >
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Dashboard">Upload Images</div>
-              </a>
-              <a href="{% url 'success_report' %}" class="menu-link mt-1" >
-                <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                <div data-i18n="Dashboard">Successful Report</div>
-              </a>
-            </li>
 
       
       
@@ -415,23 +406,24 @@
                 {% csrf_token %}
                 <div class="form-row">
                   <label for="patient-id">Patient id:</label>
-                  <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value|default_if_none:'' }}" readonly>
+                  <!-- <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value|default_if_none:'' }}" readonly> -->
+                  <input type="text" id="patient_id" name="patient_id" readonly>
 
                   <label for="patient-name">Patient name:</label>
-                  <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value|default_if_none:'' }}">
+                  <!-- <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value|default_if_none:'' }}"> -->
+                  <input type="text" id="patient_name" name="patient_name">
                 </div>
                 
                 <div class="form-row">
                   <label for="patient-email">Patient email:</label>
-                  <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value|default_if_none:'' }}">
-                  
-                  <label for="appointed-doctor">Appointed doctor:</label>
-                  <input type="text" id="appointed_doctor" name="appointed_doctor" value="{{ assigned_doctor_name }}" readonly>
+                  <!-- <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value|default_if_none:'' }}"> -->
+                  <input type="email" id="patient_email" name="patient_email">
                 </div>
                 
                 <div class="form-row">
                   <label for="patient-age">Patient age:</label>
-                  <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value|default_if_none:'' }}">
+                  <!-- <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value|default_if_none:'' }}"> -->
+                  <input type="text" id="patient_age" name="patient_age" >
                   
                   <label for="patient-gender">Patient gender:</label>
                   <div class="form-row">
@@ -455,33 +447,19 @@
                     </select>
                   </div>
                   <label for="report-date">Report Generation date:</label>
-                  <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}">
+                  <!-- <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}"> -->
+                  <input type="date" id="report_generation_date" name="report_generation_date">
                 </div>
                 
                 <div class="form-row">
                   <label for="scan-date">Scan date:</label>
-                  <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}">
+                  <!-- <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}"> -->
+                  <input type="date" id="scan_date" name="scan_date" >
                 </div>
                 
                 <div class="file-box">
                   <label>Upload the Center Image</label>
                   <input type="file" name="center_image" required>
-                </div>
-                <div class="file-box">
-                  <label>Upload Left 45 Image</label>
-                  <input type="file" name="left_45_image" required>
-                </div>
-                <div class="file-box">
-                  <label>Upload Left 90 Image</label>
-                  <input type="file" name="left_90_image" required> 
-                </div>
-                <div class="file-box">
-                  <label>Upload Right 45 Image</label>
-                  <input type="file" name="right_45_image" required> 
-                </div>
-                <div class="file-box">
-                  <label>Upload Right 90 Image</label>
-                  <input type="file" name="right_90_image" required> 
                 </div>
                 <div class="form-footer">
                   <button type="submit" class="upload-btn">Submit</button>
@@ -489,86 +467,6 @@
               </form>
             </div>
           </div>
-<!-- 
-      
-          <div class="layout-container">
-              <div class="form-container">
-                <h2>User Form and Image Upload</h2>
-                <form method="post" enctype="multipart/form-data" action="{% url 'upload-image' %}">
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <label for="patient_id">Patient ID:</label>
-                        <input type="text" id="patient_id" name="patient_id" value="{{ form.patient_id.value }}" readonly>
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_name">Patient Name:</label>
-                        <input type="text" id="patient_name" name="patient_name" value="{{ form.patient_name.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_email">Patient Email:</label>
-                        <input type="email" id="patient_email" name="patient_email" value="{{ form.patient_email.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="appointed_doctor">Appointed Doctor:</label>
-                        <input type="text" id="appointed_doctor" name="appointed_doctor" value="{{ form.appointed_doctor.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_age">Patient Age:</label>
-                        <input type="text" id="patient_age" name="patient_age" value="{{ form.patient_age.value }}">
-                    </div>
-                    <div class="form-row">
-                        <label for="patient_gender">Patient Gender:</label>
-                        <select id="patient_gender" name="patient_gender">
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label for="center">Center:</label>
-                        <select id="center" name="center">
-                            <option value="">Select Center</option>
-                            <option value="Mumbai">Mumbai</option>
-                            <option value="Pune">Pune</option>
-                            <option value="Nagpur">Nagpur</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label for="report_generation_date">Report Generation Date:</label>
-                        <input type="date" id="report_generation_date" name="report_generation_date" value="{{ form.report_generation_date.value }}">
-                    </div>
-                    <div class="form-group">
-                      <label for="scan_date">Scan Date:</label>
-                      <input type="date" id="scan_date" name="scan_date" value="{{ form.scan_date.value }}">
-                    </div>
-                    <div class="file-box">
-                      <label>Upload the Center Image</label>
-                      <input type="file" name="center_image" required>
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Left 45 Image</label>
-                      <input type="file" name="left_45_image" required>
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Left 90 Image</label>
-                      <input type="file" name="left_90_image" required> 
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Right 45 Image</label>
-                      <input type="file" name="right_45_image" required> 
-                    </div>
-                    <div class="file-box">
-                      <label>Upload Right 90 Image</label>
-                      <input type="file" name="right_90_image" required> 
-                    </div>
-                    <div class="form-footer">
-                      <button type="submit" class="upload-btn">Upload All</button>
-                    </div>
-                </form>
-              </div>
-
-            </div> -->
           
             <!-- / Content -->
 

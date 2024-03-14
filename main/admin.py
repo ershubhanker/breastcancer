@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserForm, Image, Doctor, Assignment
+from .models import UserForm, Image, Doctor, Assignment, PdfReport
 
 class AssignmentInline(admin.TabularInline):
     model = Assignment
@@ -34,5 +34,6 @@ class DoctorAdmin(admin.ModelAdmin):
     inlines = [AssignmentInline]
 
 admin.site.register(UserForm)
+admin.site.register(PdfReport)
 admin.site.register(Image, ImageAdmin)
 admin.site.register(Doctor, DoctorAdmin)

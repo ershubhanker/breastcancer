@@ -7,7 +7,8 @@ from django.http import request
 import random
 from django.db import models
 from django.conf import settings
-
+from django.db.models import Count, DateField
+from django.db.models.functions import TruncDay
 
 # class Notification(models.Model):
 #     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,7 +51,7 @@ class UserForm(models.Model):
     center = models.CharField(max_length=50, choices=CENTER_CHOICES)
     report_generation_date = models.DateField()
     scan_date = models.DateField()
-
+    main_image = models.ForeignKey('Image', on_delete=models.SET_NULL, null=True, blank=True, related_name='main_user_form')
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 class Image(models.Model):
@@ -62,6 +63,7 @@ class Image(models.Model):
     status = models.CharField(max_length=100, default='default_status')  # Add a default value
     assigned_doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True)
     uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='uploaded_images')
+    
 class Doctor(AbstractUser):
     fullname = models.CharField(max_length=100, null=True, blank=True)
     specialty = models.CharField(max_length=100, null=True, blank=True)
@@ -95,7 +97,11 @@ class Doctor(AbstractUser):
     def remove_credit(self):
         self.credit_val -= 1
         self.save()
-  
+
+class PdfReport(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    report_file = models.FileField(upload_to='pdf_reports/')
+    doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True)
 class CreditRequest(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     request_date = models.DateTimeField(auto_now_add=True)

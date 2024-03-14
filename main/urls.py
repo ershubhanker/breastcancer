@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,re_path
 from . import views
 from  django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import SetPasswordForm
@@ -8,8 +8,7 @@ from django.contrib.auth.views import PasswordResetConfirmView
 from rest_framework.routers import DefaultRouter
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import GeneratePDFView
-
+from .views import GeneratePDFView, UserFormCreateView
 router = DefaultRouter()
 router.register("api/upload-images", views.ImageprocessViewAPI, basename="upload-images")
 
@@ -27,7 +26,9 @@ urlpatterns = [
     # Generate pdf
     path('generate-pdf/', GeneratePDFView.as_view(), name='generate_pdf'),
     # home pages
-    # path('home/', views.home, name='home'),
+    path('home/', views.home, name='home'),
+    path('upload/',views.autothermix_upload, name = 'upload'),
+    path('doctor_home/', views.doctor_home, name='doctor-home'),
     # path('operator-home/', views.operator_home, name = "operator-home"),
     # admin home page
     path('home-admin/', views.adminhome, name='admin_home'),
@@ -49,16 +50,18 @@ urlpatterns = [
     path('index/', views.index, name = "index"),
     #doctor-profile
     path('doctor-profile/', views.DoctorProfile,  name = "DoctorProfile"),
-
+    path('api/user-form/', UserFormCreateView.as_view(), name='user-form-create'),
+    re_path(r'^api/upload-image/(?P<user_form_id>\d+)/$', views.ImageUploadAPIView.as_view(), name='image-upload-api'),
     # doctor-services
     # path('services/', views.services, name = "services"),
-
+    path('dashboard/', views.dashboard, name='dashboard'),
     # doctor-image uploadings
     path('upload-images/', views.upload_image, name = "upload-image"),
-
+    path('success-report/', views.success_report_view, name='success_report'),
     # doctor pending requests
     path('pending-request/', views.pendingRequest, name = "pendingRequest"),
-
+    
+    
     # doctor request successes
     path('success-request/', views.successRequest, name = "successRequest"),
 
